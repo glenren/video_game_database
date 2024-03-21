@@ -28,7 +28,11 @@ error_reporting(E_ALL);
 // Set some parameters
 
 // Database access configuration
-include 'credentials.php';
+$creds = fopen("credentials.txt", "r") or die("Unable to open file!");
+$config["dbuser"] = trim(fgets($creds));
+$config["dbpassword"] = trim(fgets($creds));
+$config["dbserver"] = "dbhost.students.cs.ubc.ca:1522/stu";
+fclose($creds);
 $db_conn = NULL;	// login credentials are used in connectToDB()
 
 $success = true;	// keep track of errors so page redirects only if there are no errors
