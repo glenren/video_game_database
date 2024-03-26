@@ -46,8 +46,10 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 <html>
 
 <head>
-	<title>CPSC 304 PHP/Oracle Demonstration</title>
+	<title>Video Game Database</title>
 </head>
+
+<h1>CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
 
 <body>
 	<h2>Reset</h2>
