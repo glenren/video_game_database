@@ -5,6 +5,6 @@ The domain of our application would be product information regarding video games
 
 ## To connect to a person's Oracle server
 
-A text file called "credentials.txt" must be in the same directory as website.php.
+Add a text file called "credentials.txt" must be in the same directory as website.php (do not push to repo).
 The first line of this text file must have the username (for students, "ora_cwl" where cwl is your cwl).
 The second line must be the password (for students, "a" and your student number after).
