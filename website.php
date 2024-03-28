@@ -51,13 +51,27 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 
 <body>
 	<h2>Reset</h2>
-	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
+	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you
+		MUST use reset</p>
 
 	<form method="POST" action="website.php">
 		<!-- "action" specifies the file or page that will receive the form data for processing. As with this example, it can be this same file. -->
 		<input type="hidden" id="resetTablesRequest" name="resetTablesRequest">
 		<p><input type="submit" value="Reset" name="reset"></p>
 	</form>
+	<?php
+	function handleResetRequest()
+	{
+		global $db_conn;
+		// Drop old table
+		executePlainSQL("DROP TABLE demoTable");
+
+		// Create new table
+		echo "<br> creating new table <br>";
+		executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
+		oci_commit($db_conn);
+	}
+	?>
 
 	<hr />
 
@@ -69,6 +83,25 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 
 		<input type="submit" value="Insert" name="insertSubmit"></p>
 	</form>
+	<?php
+	function handleInsertRequest()
+	{
+		global $db_conn;
+
+		//Getting the values from user and insert data into the table
+		$tuple = array(
+			":bind1" => $_POST['insNo'],
+			":bind2" => $_POST['insName']
+		);
+
+		$alltuples = array(
+			$tuple
+		);
+
+		executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
+		oci_commit($db_conn);
+	}
+	?>
 
 	<hr />
 
@@ -82,6 +115,19 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 
 		<input type="submit" value="Update" name="updateSubmit"></p>
 	</form>
+	<?php
+	function handleUpdateRequest()
+	{
+		global $db_conn;
+
+		$old_name = $_POST['oldName'];
+		$new_name = $_POST['newName'];
+
+		// you need the wrap the old name and new name values with single quotations
+		executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
+		oci_commit($db_conn);
+	}
+	?>
 
 	<hr />
 
@@ -90,6 +136,18 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 		<input type="hidden" id="countTupleRequest" name="countTupleRequest">
 		<input type="submit" name="countTuples"></p>
 	</form>
+	<?php
+	function handleCountRequest()
+	{
+		global $db_conn;
+
+		$result = executePlainSQL("SELECT Count(*) FROM demoTable");
+
+		if (($row = oci_fetch_row($result)) != false) {
+			echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
+		}
+	}
+	?>
 
 	<hr />
 
@@ -98,11 +156,31 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 		<input type="hidden" id="displayTuplesRequest" name="displayTuplesRequest">
 		<input type="submit" name="displayTuples"></p>
 	</form>
+	<?php
+	function handleDisplayRequest()
+	{
+		global $db_conn;
+		$result = executePlainSQL("SELECT * FROM demoTable");
+		printResult($result);
+	}
 
+	function printResult($result)
+	{ //prints results from a select statement
+		echo "<br>Retrieved data from table demoTable:<br>";
+		echo "<table>";
+		echo "<tr><th>ID</th><th>Name</th></tr>";
+
+		while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
+			echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]"
+		}
+
+		echo "</table>";
+	}
+	?>
 
 	<?php
-	// The following code will be parsed as PHP
-
+	// Other functions
+	
 	function debugAlertMessage($message)
 	{
 		global $show_debug_alert_messages;
@@ -119,7 +197,7 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 
 		$statement = oci_parse($db_conn, $cmdstr);
 		//There are a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
+	
 		if (!$statement) {
 			echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
 			$e = OCI_Error($db_conn); // For oci_parse errors pass the connection handle
@@ -141,9 +219,9 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 	function executeBoundSQL($cmdstr, $list)
 	{
 		/* Sometimes the same statement will be executed several times with different values for the variables involved in the query.
-		In this case you don't need to create the statement several times. Bound variables cause a statement to only be
-		parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
-		See the sample code below for how this function is used */
+											In this case you don't need to create the statement several times. Bound variables cause a statement to only be
+											parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
+											See the sample code below for how this function is used */
 
 		global $db_conn, $success;
 		$statement = oci_parse($db_conn, $cmdstr);
@@ -174,18 +252,6 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 		}
 	}
 
-	function printResult($result)
-	{ //prints results from a select statement
-		echo "<br>Retrieved data from table demoTable:<br>";
-		echo "<table>";
-		echo "<tr><th>ID</th><th>Name</th></tr>";
-
-		while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
-			echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]"
-		}
-
-		echo "</table>";
-	}
 
 	function connectToDB()
 	{
@@ -214,66 +280,6 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 
 		debugAlertMessage("Disconnect from Database");
 		oci_close($db_conn);
-	}
-
-	function handleUpdateRequest()
-	{
-		global $db_conn;
-
-		$old_name = $_POST['oldName'];
-		$new_name = $_POST['newName'];
-
-		// you need the wrap the old name and new name values with single quotations
-		executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
-		oci_commit($db_conn);
-	}
-
-	function handleResetRequest()
-	{
-		global $db_conn;
-		// Drop old table
-		executePlainSQL("DROP TABLE demoTable");
-
-		// Create new table
-		echo "<br> creating new table <br>";
-		executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-		oci_commit($db_conn);
-	}
-
-	function handleInsertRequest()
-	{
-		global $db_conn;
-
-		//Getting the values from user and insert data into the table
-		$tuple = array(
-			":bind1" => $_POST['insNo'],
-			":bind2" => $_POST['insName']
-		);
-
-		$alltuples = array(
-			$tuple
-		);
-
-		executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
-		oci_commit($db_conn);
-	}
-
-	function handleCountRequest()
-	{
-		global $db_conn;
-
-		$result = executePlainSQL("SELECT Count(*) FROM demoTable");
-
-		if (($row = oci_fetch_row($result)) != false) {
-			echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
-		}
-	}
-
-	function handleDisplayRequest()
-	{
-		global $db_conn;
-		$result = executePlainSQL("SELECT * FROM demoTable");
-		printResult($result);
 	}
 
 	// HANDLE ALL POST ROUTES
@@ -319,4 +325,3 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 </body>
 
 </html>
-
