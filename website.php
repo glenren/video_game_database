@@ -49,6 +49,9 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 	<title>CPSC 304 PHP/Oracle Demonstration</title>
 </head>
 
+<h1>Video Game Database</h1>
+<h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
+
 <body>
 	<h2>Reset</h2>
 	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you
