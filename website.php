@@ -76,9 +76,9 @@ function executePlainSQL($cmdstr)
 function executeBoundSQL($cmdstr, $list)
 {
 	/* Sometimes the same statement will be executed several times with different values for the variables involved in the query.
-							  In this case you don't need to create the statement several times. Bound variables cause a statement to only be
-							  parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
-							  See the sample code below for how this function is used */
+												   In this case you don't need to create the statement several times. Bound variables cause a statement to only be
+												   parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
+												   See the sample code below for how this function is used */
 	global $db_conn, $success;
 	$statement = oci_parse($db_conn, $cmdstr);
 	if (!$statement) {
@@ -174,6 +174,46 @@ function handleGETRequest()
 		disconnectFromDB();
 	}
 }
+
+function sql_file_to_array($location)
+{
+	//load file
+	$commands = file_get_contents($location);
+
+	//delete comments
+	$lines = explode("\n", $commands);
+	$commands = '';
+	foreach ($lines as $line) {
+		$line = trim($line);
+		if ($line && !str_starts_with($line, '--')) {
+			$commands .= $line . "\n";
+		}
+	}
+
+	//convert to array
+	$commands = explode(";", $commands);
+	return $commands;
+}
+
+function run_sql_file($location)
+{
+	global $db_conn;
+	$commands = sql_file_to_array($location);
+	//run commands
+	$total = $success = 0;
+	foreach ($commands as $command) {
+		if (trim($command)) {
+			$success += (@executePlainSQL($command) == false ? 0 : 1);
+			oci_commit($db_conn);
+			$total += 1;
+		}
+	}
+	//return number of successful queries and total number of queries found
+	return array(
+		"success" => $success,
+		"total" => $total
+	);
+}
 ?>
 
 <html>
@@ -196,13 +236,8 @@ function handleGETRequest()
 	<?php
 	function handleResetRequest()
 	{
-		global $db_conn;
-		// Drop old table
-		executePlainSQL("DROP TABLE demoTable");
-		// Create new table
-		echo "<br> creating new table <br>";
-		executePlainSQL("CREATE TABLE demoTable (id int PRIMARY KEY, name char(30))");
-		oci_commit($db_conn);
+		// Drop old table and create new ones
+		run_sql_file("database.sql");
 	}
 	?>
 
@@ -272,19 +307,46 @@ function handleGETRequest()
 		<input type="submit" name="getAction" value="display"></p>
 	</form>
 	<?php
+	function debug_to_console($data)
+	{
+		$output = $data;
+		if (is_array($output))
+			$output = implode(',', $output);
+
+		echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+	}
 	function handleDisplayRequest()
 	{
 		global $db_conn;
-		$result = executePlainSQL("SELECT * FROM demoTable");
-		printResult($result);
+		$commands = sql_file_to_array("select.sql");
+		foreach ($commands as $command) {
+			if (trim($command)) {
+				debug_to_console($command);
+				$result = executePlainSQL($command);
+				oci_commit($db_conn);
+				printResult($result);
+			}
+		}
 	}
 	function printResult($result)
 	{ //prints results from a select statement
-		echo "<br>Retrieved data from table demoTable:<br>";
 		echo "<table>";
-		echo "<tr><th>ID</th><th>Name</th></tr>";
+		$headerPrinted = false;
 		while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
-			echo "<tr><td>" . $row["ID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]"
+			$tuple = "<tr>";
+			$header = "<tr>";
+			foreach ($row as $key => $value) {
+				if (!$headerPrinted) {
+					$header = $header . "<th>" . $key . "</th>";
+				}
+				debug_to_console($tuple);
+				$tuple = $tuple . "<td>" . $value . "</td>";
+			}
+			$tuple = $tuple . "</tr>";
+			$header = $header . "</tr>";
+			echo $header;
+			$headerPrinted = true;
+			echo $tuple;
 		}
 		echo "</table>";
 	}

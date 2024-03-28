@@ -446,7 +446,7 @@ INSERT INTO VideoGameMadeBy(
 	)
 VALUES (
 		'101945',
-		'Dragon Ball'
+		'Dragon Ball',
 		TO_DATE('2018-01-26', 'yyyy/mm/dd'),
 		'59.99',
 		'Fighting',
