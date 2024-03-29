@@ -258,11 +258,44 @@ function run_sql_file($location)
 <head>
 	<link rel="stylesheet" href="style.css">
 	<title>CPSC 304 PHP/Oracle Demonstration</title>
+	<!-- setting the style for the nav bar. borrowed from https://www.w3schools.com/css/css_navbar_vertical.asp -->
+	<style>
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: #f1f1f1;
+}
+
+li a {
+  display: block;
+  color: #000;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color on hover */
+li a:hover {
+  background-color: #555;
+  color: white;
+}
+</style>
+
 </head>
 <h1>Video Game Database</h1>
 <h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
 
 <body>
+<!-- navigation bar to go to different pages -->
+
+<ul>
+  <li><a href="#home">Home</a></li>
+  <li><a href="#news">Video Games</a></li>
+  <li><a href="account_test.php">Users</a></li>
+  <li><a href="#about">Dev Teams</a></li>
+</ul>
+
 	<hr />
 	<h2>Reset</h2>
 	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you
