@@ -280,10 +280,14 @@ function run_sql_file($location)
 	?>
 
 	<hr />
-	<h2>Insert Values into DemoTable</h2>
+	<h2>Add A Video Game</h2>
 	<form method="POST" action="website.php">
-		Number: <input type="text" name="insNo"> <br /><br />
-		Name: <input type="text" name="insName"> <br /><br />
+		GID: <input type="text" name="GID"> <br /><br />
+		Video Game Title: <input type="text" name="gameTitle"> <br /><br />
+		Release Date: <input type="text" name="releaseDate"> <br /><br />
+		Price: <input type="text" name="price"> <br /><br /> 
+		Category: <input type="text" name="category"> <br /><br />
+		Development Team: <input type="text" name="devteamName"> <br /><br />
 		<input type="submit" name="postAction" value="<?= $postInsert ?>"></p>
 	</form>
 	<?php
@@ -292,13 +296,17 @@ function run_sql_file($location)
 		global $db_conn;
 		//Getting the values from user and insert data into the table
 		$tuple = array(
-			":bind1" => $_POST['insNo'],
-			":bind2" => $_POST['insName']
+			":bind1" => $_POST['GID'],
+			":bind2" => $_POST['gameTitle'],
+			":bind3" => $_POST['releaseDate'], //has to be in form dd-MMMM-yyyy
+			":bind4" => $_POST['price'],
+			":bind5" => $_POST['category'],
+			":bind6" => $_POST['devteamName'] //case sensitive
 		);
 		$alltuples = array(
 			$tuple
 		);
-		executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
+		executeBoundSQL("INSERT INTO VideoGameMadeBy VALUES (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
 		// oci_commit($db_conn);
 	
 		if (oci_commit($db_conn)) {
