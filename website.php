@@ -50,8 +50,9 @@ function debugAlertMessage($message)
 	}
 }
 
-function popUp($message) {
-    echo "<script>alert('$message');</script>";
+function popUp($message)
+{
+	echo "<script>alert('$message');</script>";
 }
 
 function executePlainSQL($cmdstr)
@@ -80,9 +81,9 @@ function executePlainSQL($cmdstr)
 function executeBoundSQL($cmdstr, $list)
 {
 	/* Sometimes the same statement will be executed several times with different values for the variables involved in the query.
-												   In this case you don't need to create the statement several times. Bound variables cause a statement to only be
-												   parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
-												   See the sample code below for how this function is used */
+													  In this case you don't need to create the statement several times. Bound variables cause a statement to only be
+													  parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
+													  See the sample code below for how this function is used */
 	global $db_conn, $success;
 	$statement = oci_parse($db_conn, $cmdstr);
 	if (!$statement) {
@@ -223,6 +224,7 @@ function run_sql_file($location)
 <html>
 
 <head>
+	<link rel="stylesheet" href="style.css">
 	<title>CPSC 304 PHP/Oracle Demonstration</title>
 </head>
 <h1>Video Game Database</h1>
@@ -350,11 +352,14 @@ function run_sql_file($location)
 				$tuple = $tuple . "<td>" . $value . "</td>";
 			}
 			$tuple = $tuple . "</tr>";
-			$header = $header . "</tr>";
-			echo $header;
+			if (!$headerPrinted) {
+				$header = $header . "</tr>";
+				echo "<thead>" . $header . "</thead>" . "<tbody>";
+			}
 			$headerPrinted = true;
 			echo $tuple;
 		}
+		echo "</tbody>";
 		echo "</table>";
 	}
 	?>

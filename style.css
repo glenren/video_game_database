@@ -1,0 +1,25 @@
+table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+}
+
+thead tr {
+  background-color: #2fbac4;
+  color: #ffffff;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 4px 15px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+tr:nth-of-type(even) {
+  background-color: #e9e9e9;
+}
