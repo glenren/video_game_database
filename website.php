@@ -50,6 +50,10 @@ function debugAlertMessage($message)
 	}
 }
 
+function popUp($message) {
+    echo "<script>alert('$message');</script>";
+}
+
 function executePlainSQL($cmdstr)
 { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
@@ -262,6 +266,8 @@ function run_sql_file($location)
 		);
 		executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
 		oci_commit($db_conn);
+
+		popUp("Successfully inserted your values into the table!");
 	}
 	?>
 
@@ -296,7 +302,8 @@ function run_sql_file($location)
 		global $db_conn;
 		$result = executePlainSQL("SELECT Count(*) FROM demoTable");
 		if (($row = oci_fetch_row($result)) != false) {
-			echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
+			// echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
+			popUp("The number of tuples in demoTable: " . $row[0]);
 		}
 	}
 	?>
