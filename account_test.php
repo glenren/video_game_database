@@ -16,11 +16,13 @@
 -->
 
 <?php
-// The following 3 lines allow PHP errors to be displayed along with the page content.
-// Delete or comment out this block when it's no longer needed.
+// The following 3 lines allow PHP errors to be displayed along with the page
+// content. Delete or comment out this block when it's no longer needed.
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// Set some parameters
 
 // Database access configuration
 $creds = fopen("credentials.txt", "r") or die("Unable to open file!");
@@ -32,35 +34,13 @@ $db_conn = NULL;	// login credentials are used in connectToDB()
 $success = true;	// keep track of errors so page redirects only if there are no errors
 $show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
 
-// Table list
-$tables = array(
-"Dev" => array("Name", "Website"),
-"Producer" => array(),
-"Composer" => array(),
-"ArtDesign" => array(),
-"Programmer" => array(),
-"Publisher" => array(),
-"DevTeam" => array(),
-"AssociatedWith" => array(),
-"Includes" => array(),
-"Platform" => array(),
-"VideoGameMadeBy" => array(),
-"PlayedOn" => array(),
-"ContainsDLC" => array(),
-"Account" => array(),
-"Adds" => array(),
-"MakesReviewReviewing2" => array(),
-"MakesReviewReviewing1" => array(),
-"MakesReviewReviewing3" => array(),
-);
-
 // Command strings for ORACLE
 $postReset = "reset";
 $postInsert = 'insert';
+$getLookUp = 'lookup';
 $postUpdate = 'update';
 $getCount = 'count';
 $getDisplay = 'display';
-$getQuery = 'query';
 
 // Other functions
 function debugAlertMessage($message)
@@ -101,13 +81,10 @@ function executePlainSQL($cmdstr)
 
 function executeBoundSQL($cmdstr, $list)
 {
-	/*
-	 * Sometimes the same statement will be executed several times with different values for the variables involved in the query.
-	 * In this case you don't need to create the statement several times.
-	 * Bound variables cause a statement to only be parsed once and you can reuse the statement.
-	 * This is also very useful in protecting against SQL injection.
-	 * See the sample code below for how this function is used
-	 */
+	/* Sometimes the same statement will be executed several times with different values for the variables involved in the query.
+													  In this case you don't need to create the statement several times. Bound variables cause a statement to only be
+													  parsed once and you can reuse the statement. This is also very useful in protecting against SQL injection.
+													  See the sample code below for how this function is used */
 	global $db_conn, $success;
 	$statement = oci_parse($db_conn, $cmdstr);
 	if (!$statement) {
@@ -116,11 +93,10 @@ function executeBoundSQL($cmdstr, $list)
 		echo htmlentities($e['message']);
 		$success = False;
 	}
-	// $ret = array();
 	foreach ($list as $tuple) {
 		foreach ($tuple as $bind => $val) {
-			// echo $val;
-			// echo "<br>" . $bind . "<br>";
+			//echo $val;
+			//echo "<br>".$bind."<br>";
 			oci_bind_by_name($statement, $bind, $val);
 			unset($val); //make sure you do not remove this. Otherwise $val will remain in an array object wrapper which will not be recognized by Oracle as a proper datatype
 		}
@@ -132,10 +108,7 @@ function executeBoundSQL($cmdstr, $list)
 			echo "<br>";
 			$success = False;
 		}
-		// array_push($ret, $statement);
 	}
-	$ret = $statement;
-	return $ret;
 }
 
 
@@ -195,7 +168,7 @@ function handleGETRequest()
 {
 	global $getCount;
 	global $getDisplay;
-	global $getQuery;
+	global $getLookUp;
 	if (connectToDB()) {
 		switch ($_GET['getAction']) {
 			case $getCount:
@@ -204,9 +177,9 @@ function handleGETRequest()
 			case $getDisplay:
 				handleDisplayRequest();
 				break;
-			case $getQuery:
-				handleQueryRequest();
-				break;
+			case $getLookUp:
+			    handleLookUpRequest();
+			    break;
 		}
 		disconnectFromDB();
 	}
@@ -260,14 +233,14 @@ function run_sql_file($location)
 	<title>CPSC 304 PHP/Oracle Demonstration</title>
 </head>
 <h1>Video Game Database</h1>
-<h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
+<h2>CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
 
 <body>
 	<hr />
 	<h2>Reset</h2>
 	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you
 		MUST use reset</p>
-	<form method="POST" action="website.php">
+	<form method="POST" action="account_test.php">
 		<!-- "action" specifies the file or page that will receive the form data for processing. As with this example, it can be this same file. -->
 		<p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
 	</form>
@@ -277,53 +250,24 @@ function run_sql_file($location)
 		// Drop old table and create new ones
 		run_sql_file("database.sql");
 	}
-	?>
-
-	<hr />
-	<h2>Add A Video Game</h2>
-	<form method="POST" action="website.php">
-		GID: <input type="text" name="GID"> <br /><br />
-		Video Game Title: <input type="text" name="gameTitle"> <br /><br />
-		Release Date: <input type="text" name="releaseDate"> <br /><br />
-		Price: <input type="text" name="price"> <br /><br /> 
-		Category: <input type="text" name="category"> <br /><br />
-		Development Team: <input type="text" name="devteamName"> <br /><br />
-		<input type="submit" name="postAction" value="<?= $postInsert ?>"></p>
-	</form>
-	<?php
 	function handleInsertRequest()
 	{
 		global $db_conn;
 		//Getting the values from user and insert data into the table
 		$tuple = array(
-			":bind1" => $_POST['GID'],
-			":bind2" => $_POST['gameTitle'],
-			":bind3" => $_POST['releaseDate'], //has to be in form dd-MMMM-yyyy
-			":bind4" => $_POST['price'],
-			":bind5" => $_POST['category'],
-			":bind6" => $_POST['devteamName'] //case sensitive
+			":bind1" => $_POST['insNo'],
+			":bind2" => $_POST['insName']
 		);
 		$alltuples = array(
 			$tuple
 		);
-		executeBoundSQL("INSERT INTO VideoGameMadeBy VALUES (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
+		executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
 		// oci_commit($db_conn);
-	
+
 		if (oci_commit($db_conn)) {
-			popUp("Successfully inserted your values into the table!");
+		    popUp("Successfully inserted your values into the table!");
 		}
 	}
-	?>
-
-	<hr />
-	<h2>Update Name in DemoTable</h2>
-	<p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
-	<form method="POST" action="website.php">
-		Old Name: <input type="text" name="oldName"> <br /><br />
-		New Name: <input type="text" name="newName"> <br /><br />
-		<input type="submit" name="postAction" value="<?= $postUpdate ?>"></p>
-	</form>
-	<?php
 	function handleUpdateRequest()
 	{
 		global $db_conn;
@@ -332,83 +276,20 @@ function run_sql_file($location)
 		// you need the wrap the old name and new name values with single quotations
 		executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
 		// oci_commit($db_conn);
-	
+
 		if (oci_commit($db_conn)) {
-			popUp("Successfully updated value!");
+		    popUp("Successfully updated value!");
 		}
 	}
-	?>
-
-	<hr />
-	<h2>Number of Video Games in Database</h2>
-	<form method="GET" action="website.php">
-		<input type="submit" name="getAction" value="<?= $getCount ?>"></p>
-	</form>
-	<?php
 	function handleCountRequest()
 	{
 		global $db_conn;
-		$result = executePlainSQL("SELECT Count(*) FROM VideoGameMadeBy");
+		$result = executePlainSQL("SELECT Count(*) FROM demoTable");
 		if (($row = oci_fetch_row($result)) != false) {
-			// echo "<br> The number of video games in database: " . $row[0] . "<br>";
-			popUp("The number of video games in database: " . $row[0]);
+			// echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
+			popUp("The number of tuples in demoTable: " . $row[0]);
 		}
 	}
-	?>
-
-	<hr />
-	<h2>General Query</h2>
-	<form method="GET" action="website.php">
-		SELECT: <input type="text" name="select">
-		<br />
-		FROM: <input type="text" name="from">
-		<br />
-		WHERE: <input type="text" name="where">
-		<br />
-		GROUP BY: <input type="text" name="groupby">
-		<br />
-		HAVING: <input type="text" name="having">
-		<br />
-		<input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
-	</form>
-	<?php
-	function handleQueryRequest()
-	{
-		global $db_conn;
-		//Getting the values from user and insert data into the table
-		$tuple = array(
-			":bind1" => $_GET['where'],
-			":bind2" => $_GET['groupby'],
-			":bind3" => $_GET['having']
-		);
-		$alltuples = array(
-			$tuple
-		);
-		$results = executeBoundSQL(
-			"SELECT " . $_GET['select'] .
-			" FROM " . $_GET['from'] .
-			// " WHERE (" . $_GET['where'] . ")" .
-			// " GROUP BY (" . $_GET['groupby'] . ")" .
-			// " HAVING (" . $_GET['having'] . ")" .
-			"",
-			$alltuples
-		);
-
-		if (oci_commit($db_conn)) {
-			// foreach ($results as $result) { }
-			printResult($results);
-			popUp("Success!");
-		}
-	}
-	?>
-
-
-	<hr />
-	<h2>Display Tuples in DemoTable</h2>
-	<form method="GET" action="website.php">
-		<input type="submit" name="getAction" value="display"></p>
-	</form>
-	<?php
 	function debug_to_console($data)
 	{
 		$output = $data;
@@ -455,9 +336,26 @@ function run_sql_file($location)
 		echo "</tbody>";
 		echo "</table>";
 	}
-	?>
+	function handleLookUpRequest() {
+	    global $db_conn;
 
-	<?php
+	    $command = "SELECT g.Name, g.DevTeamName, g.Category, a.Status FROM VideoGameMadeBy g, Adds a "
+	    . "WHERE a.Username = '" . $_GET['insName'] . "' AND a.GID = g.GID";
+
+	    debug_to_console($command);
+	    $result = executePlainSQL($command);
+	    oci_commit($db_conn);
+	    echo "<hr/><h2>" . $_GET['insName'] . "'s Added Games:</h2>";
+	    printResult($result);
+	}
+    ?>
+    <hr />
+    <h2>Select User</h2>
+    <form method="GET" action="account_test.php">
+        Username: <input type="text" name="insName"> <br /><br />
+        <input type="submit" name="getAction" value="<?= $getLookUp ?>"></p>
+    </form>
+    <?php
 	if (isset($_POST['postAction'])) {
 		handlePOSTRequest();
 	} else if (
