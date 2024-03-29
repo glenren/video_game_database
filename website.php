@@ -34,24 +34,24 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 
 // Table list
 $tables = array(
-	"Dev" => array("Name", "Website"),
-	"Producer" => array("Name"),
-	"Composer" => array("Name", "Genre", "Instrument"),
-	"ArtDesign" => array("Name", "ArtistRole", "Style"),
-	"Programmer" => array("Name", "Task"),
-	"Publisher" => array("Name", "Location", "Employees"),
-	"DevTeam" => array("Name", "Employees", "Location"),
-	"AssociatedWith" => array("DevTeamName", "PublisherName"),
-	"Includes" => array("DevTeamName", "DevName"),
-	"Platform" => array("Name", "Type"),
-	"VideoGameMadeBy" => array("GID", "NAME", "RELEASEDATE", "PRICE", "CATEGORY", "DEVTEAMNAME"),
-	"PlayedOn" => array("GID", "NAME"),
-	"ContainsDLC" => array("GID", "NAME", "PRICE", "RELEASEDATE"),
-	"Account" => array("USERNAME", "EMAIL", "DISPLAYNAME", "CREATIONDATE"),
-	"Adds" => array("USERNAME", "GID", "STATUS"),
-	"MakesReviewReviewing2" => array("LENGTH", "CATEGORY"),
-	"MakesReviewReviewing1" => array("REVIEWID", "REVIEWDATE", "RATING", "LENGTH", "USERNAME", "GID"),
-	"MakesReviewReviewing3" => array("REVIEWID", "CATEGORY"),
+	"Dev" => array("name", "website"),
+	"Producer" => array("name"),
+	"Composer" => array("name", "genre", "instrument"),
+	"ArtDesign" => array("name", "artistrole", "style"),
+	"Programmer" => array("name", "task"),
+	"Publisher" => array("name", "location", "employees"),
+	"DevTeam" => array("name", "employees", "location"),
+	"AssociatedWith" => array("devteamname", "publishername"),
+	"Includes" => array("devteamname", "devname"),
+	"Platform" => array("name", "type"),
+	"VideoGameMadeBy" => array("gid", "name", "releasedate", "price", "category", "devteamname"),
+	"PlayedOn" => array("gid", "name"),
+	"ContainsDLC" => array("gid", "name", "price", "releasedate"),
+	"Account" => array("username", "email", "displayname", "creationdate"),
+	"Adds" => array("username", "gid", "status"),
+	"MakesReviewReviewing2" => array("length", "category"),
+	"MakesReviewReviewing1" => array("reviewid", "reviewdate", "rating", "length", "username", "gid"),
+	"MakesReviewReviewing3" => array("reviewid", "category"),
 );
 
 // Command strings for ORACLE
@@ -285,7 +285,7 @@ function run_sql_file($location)
 		GID: <input type="text" name="GID"> <br /><br />
 		Video Game Title: <input type="text" name="gameTitle"> <br /><br />
 		Release Date: <input type="text" name="releaseDate"> <br /><br />
-		Price: <input type="text" name="price"> <br /><br /> 
+		Price: <input type="text" name="price"> <br /><br />
 		Category: <input type="text" name="category"> <br /><br />
 		Development Team: <input type="text" name="devteamName"> <br /><br />
 		<input type="submit" name="postAction" value="<?= $postInsert ?>"></p>
@@ -359,9 +359,15 @@ function run_sql_file($location)
 	<hr />
 	<h2>General Query</h2>
 	<form method="GET" action="website.php">
-		SELECT: <input type="text" name="select">
+		FROM: <select name="from">
+			<?php
+			foreach ($tables as $table => $columns) {
+				echo "<option value=\"" . $table . "\">" . $table . "</option>";
+			}
+			?>
+		</select>
 		<br />
-		FROM: <input type="text" name="from">
+		SELECT: <input type="text" name="select">
 		<br />
 		WHERE: <input type="text" name="where">
 		<br />
@@ -375,6 +381,7 @@ function run_sql_file($location)
 	function handleQueryRequest()
 	{
 		global $db_conn;
+		global $tables;
 		//Getting the values from user and insert data into the table
 		$tuple = array(
 			":bind1" => $_GET['where'],
@@ -384,6 +391,13 @@ function run_sql_file($location)
 		$alltuples = array(
 			$tuple
 		);
+		if (
+			!in_array($_GET['select'], $tables[$_GET['from']])
+			&& $_GET['select'] != "*"
+		) {
+			popUp("Invalid column");
+			return;
+		}
 		$results = executeBoundSQL(
 			"SELECT " . $_GET['select'] .
 			" FROM " . $_GET['from'] .
