@@ -46,7 +46,7 @@ function debugAlertMessage($message)
 {
 	global $show_debug_alert_messages;
 	if ($show_debug_alert_messages) {
-		echo "<script type='text/javascript'>alert('" . $message . "');</script>";
+		echo "<script type='text/javascript'>alert('$message');</script>";
 	}
 }
 
@@ -265,9 +265,11 @@ function run_sql_file($location)
 			$tuple
 		);
 		executeBoundSQL("insert into demoTable values (:bind1, :bind2)", $alltuples);
-		oci_commit($db_conn);
+		// oci_commit($db_conn);
 
-		popUp("Successfully inserted your values into the table!");
+		if (oci_commit($db_conn)) {
+		    popUp("Successfully inserted your values into the table!");
+		}
 	}
 	?>
 
@@ -287,7 +289,11 @@ function run_sql_file($location)
 		$new_name = $_POST['newName'];
 		// you need the wrap the old name and new name values with single quotations
 		executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
-		oci_commit($db_conn);
+		// oci_commit($db_conn);
+
+		if (oci_commit($db_conn)) {
+		    popUp("Successfully updated value!");
+		}
 	}
 	?>
 
