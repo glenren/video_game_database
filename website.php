@@ -332,7 +332,7 @@ function run_sql_file($location)
 	?>
 
 	<hr />
-	<h2>Count the Tuples in DemoTable</h2>
+	<h2>Number of Video Games in Database</h2>
 	<form method="GET" action="website.php">
 		<input type="submit" name="getAction" value="<?= $getCount ?>"></p>
 	</form>
@@ -340,10 +340,10 @@ function run_sql_file($location)
 	function handleCountRequest()
 	{
 		global $db_conn;
-		$result = executePlainSQL("SELECT Count(*) FROM demoTable");
+		$result = executePlainSQL("SELECT Count(*) FROM VideoGameMadeBy");
 		if (($row = oci_fetch_row($result)) != false) {
-			// echo "<br> The number of tuples in demoTable: " . $row[0] . "<br>";
-			popUp("The number of tuples in demoTable: " . $row[0]);
+			// echo "<br> The number of video games in database: " . $row[0] . "<br>";
+			popUp("The number of video games in database: " . $row[0]);
 		}
 	}
 	?>
