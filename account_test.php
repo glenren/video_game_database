@@ -37,7 +37,7 @@ $show_debug_alert_messages = False; // show which methods are being triggered (s
 // Command strings for ORACLE
 $postReset = "reset";
 $postInsert = 'insert';
-$getLookUp = 'lookup';
+$getLookUp = 'Search';
 $postUpdate = 'update';
 $getCount = 'count';
 $getDisplay = 'display';
