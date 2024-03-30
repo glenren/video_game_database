@@ -46,7 +46,6 @@ foreach ($table_column_pair['TABLE_NAME'] as $index => $tablename) {
 	}
 	array_push($tables[$tablename], $table_column_pair['COLUMN_NAME'][$index]);
 }
-var_dump($tables);
 disconnectFromDB();
 
 function debug_to_console($data)
@@ -396,21 +395,18 @@ function run_sql_file($location)
 	<hr />
 	<h2>General Query</h2>
 	<form method="GET" action="website.php">
-		FROM: <select name="inputFrom">
+		FROM: <input type="text" name="inputFrom">
+		<!-- <select name="inputFrom">
 			<?php
-			foreach ($tables as $table => $columns) {
-				echo "<option value=\"" . $table . "\">" . $table . "</option>";
-			}
+			// foreach ($tables as $table => $columns) {
+			// 	echo "<option value=\"" . $table . "\">" . $table . "</option>";
+			// }
 			?>
-		</select>
+		</select> -->
 		<br />
 		SELECT Column: <input type="text" name="inputSelect">
 		<br />
-		WHERE Column: <input type="text" name="inputWhereColumn">
-		<br />
-		WHERE Operator: <input type="text" name="inputWhereOp">
-		<br />
-		WHERE Comparison Value: <input type="text" name="inputWhereCompareTo">
+		WHERE Column: <input type="text" name="inputWhere">
 		<br />
 		GROUP BY: <input type="text" name="inputGroupBy">
 		<br />
@@ -419,38 +415,54 @@ function run_sql_file($location)
 		<input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
 	</form>
 	<?php
-	$operators = array(
-		"=",
-		"<>",
-		">",
-		">=",
-		"<",
-		"<=",
-	);
-	function sanitize()
+	// $operators = array(
+	// 	"=",
+	// 	"<>",
+	// 	">",
+	// 	">=",
+	// 	"<",
+	// 	"<=",
+	// );
+	function areTokensOK()
 	{
 		global $tables;
 		global $operators;
+
 		$_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
-		if (!in_array($_GET['inputFrom'], array_keys($tables))) {
-			popUp("Invalid table");
-			return false;
+		trim($_GET['inputFrom']);
+		$tablesFrom = preg_split("/,/", $_GET["inputFrom"]);
+		foreach ($tablesFrom as $table) {
+			if (!in_array($table, array_keys($tables))) {
+				popUp("Invalid table");
+				return false;
+			}
 		}
+
 		$_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
-		if (
-			!in_array($_GET['inputSelect'], $tables[$_GET['inputFrom']])
+		$inSelectedTables = false;
+		foreach ($tablesFrom as $table){
+			if (in_array($_GET['inputSelect'], $tables[$table])){
+				$inSelectedTables = true;
+				break;
+			}
+		}
+		if (!$inSelectedTables
 			&& $_GET['inputSelect'] != "*"
 		) {
 			popUp("Invalid Column");
 			return false;
 		}
-		if (
-			!empty($_GET['inputWhereOp'])
-			&& !in_array($_GET['inputWhereOp'], $operators)
-		) {
-			popUp("Invalid Operators");
-			return false;
-		}
+
+		// $conditionList = preg_split("/(and)|(or)/i", $_GET['inputWhere']);
+		// foreach ($conditionList as $condition) {
+		// 	$pieces = preg_split("/\s*/", $condition);
+		// 	foreach ($pieces as $piece) {
+		// 		if (!in_array($piece, $tablesFrom)
+		// 			&& !in_array($piece, $operators)) {
+		// 				return false;
+		// 		}
+		// 	}
+		// }
 		return true;
 	}
 	function handleQueryRequest()
@@ -465,13 +477,12 @@ function run_sql_file($location)
 			$tuple
 		);
 		// Sanitize table and column names
-		if (!sanitize()) {
+		if (!areTokensOK()) {
 			return;
 		}
 		$query = "SELECT " . $_GET['inputSelect'] . " FROM " . $_GET['inputFrom'];
-		if (!empty($_GET['inputWhereColumn'])) {
-			$tuple[":bind1"] = $_GET['inputWhereCompareTo'];
-			$query .= " WHERE (" . $_GET['inputWhereColumn'] . $_GET['inputWhereOp'] . ":bind1" . ")";
+		if (!empty($_GET['inputWhere'])) {
+			$query .= " WHERE (" . $_GET['inputWhere'] . ")";
 		}
 		if (!empty($_GET['inputGroupBy'])) {
 			$query .= " GROUP BY (" . $_GET['inputGroupBy'] . ")";
