@@ -398,7 +398,7 @@ INSERT INTO VideoGameMadeBy(
 	)
 VALUES (
 		'1382330',
-		'Persona ® 5 Strikers',
+		'Persona 5 Strikers',
 		TO_DATE('2021-02-22', 'yyyy/mm/dd'),
 		'79.99',
 		'RPG',

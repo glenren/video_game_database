@@ -40,7 +40,7 @@ $statement = executePlainSQL(
 oci_commit($db_conn);
 $nrows = oci_fetch_all($statement, $table_column_pair);
 $tables = array();
-foreach($table_column_pair['TABLE_NAME'] as $index => $tablename) {
+foreach ($table_column_pair['TABLE_NAME'] as $index => $tablename) {
 	if (!array_key_exists($tablename, $tables)) {
 		$tables[$tablename] = array();
 	}
@@ -49,12 +49,13 @@ foreach($table_column_pair['TABLE_NAME'] as $index => $tablename) {
 var_dump($tables);
 disconnectFromDB();
 
-function debug_to_console($data) {
-    $output = $data;
-    if (is_array($output))
-        $output = implode(',', $output);
+function debug_to_console($data)
+{
+	$output = $data;
+	if (is_array($output))
+		$output = implode(',', $output);
 
-    echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+	echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
 }
 
 // Command strings for ORACLE
@@ -395,7 +396,7 @@ function run_sql_file($location)
 	<hr />
 	<h2>General Query</h2>
 	<form method="GET" action="website.php">
-		FROM: <select name="from">
+		FROM: <select name="inputFrom">
 			<?php
 			foreach ($tables as $table => $columns) {
 				echo "<option value=\"" . $table . "\">" . $table . "</option>";
@@ -403,47 +404,82 @@ function run_sql_file($location)
 			?>
 		</select>
 		<br />
-		SELECT: <input type="text" name="select">
+		SELECT Column: <input type="text" name="inputSelect">
 		<br />
-		WHERE: <input type="text" name="where">
+		WHERE Column: <input type="text" name="inputWhereColumn">
 		<br />
-		GROUP BY: <input type="text" name="groupby">
+		WHERE Operator: <input type="text" name="inputWhereOp">
 		<br />
-		HAVING: <input type="text" name="having">
+		WHERE Comparison Value: <input type="text" name="inputWhereCompareTo">
+		<br />
+		GROUP BY: <input type="text" name="inputGroupBy">
+		<br />
+		HAVING: <input type="text" name="inputHaving">
 		<br />
 		<input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
 	</form>
 	<?php
+	$operators = array(
+		"=",
+		"<>",
+		">",
+		">=",
+		"<",
+		"<=",
+	);
+	function sanitize()
+	{
+		global $tables;
+		global $operators;
+		$_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
+		if (!in_array($_GET['inputFrom'], array_keys($tables))) {
+			popUp("Invalid table");
+			return false;
+		}
+		$_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
+		if (
+			!in_array($_GET['inputSelect'], $tables[$_GET['inputFrom']])
+			&& $_GET['inputSelect'] != "*"
+		) {
+			popUp("Invalid Column");
+			return false;
+		}
+		if (
+			!empty($_GET['inputWhereOp'])
+			&& !in_array($_GET['inputWhereOp'], $operators)
+		) {
+			popUp("Invalid Operators");
+			return false;
+		}
+		return true;
+	}
 	function handleQueryRequest()
 	{
 		global $db_conn;
-		global $tables;
 		//Getting the values from user and insert data into the table
 		$tuple = array(
-			":bind1" => $_GET['where'],
-			":bind2" => $_GET['groupby'],
-			":bind3" => $_GET['having']
+			":bind2" => $_GET['inputGroupBy'],
+			":bind3" => $_GET['inputHaving']
 		);
 		$alltuples = array(
 			$tuple
 		);
-		$_GET['select'] = strtoupper($_GET['select']);
-		if (
-			!in_array($_GET['select'], $tables[$_GET['from']])
-			&& $_GET['select'] != "*"
-		) {
-			popUp("Invalid column");
+		// Sanitize table and column names
+		if (!sanitize()) {
 			return;
 		}
-		$results = executeBoundSQL(
-			"SELECT " . $_GET['select'] .
-			" FROM " . $_GET['from'] .
-			// " WHERE (" . $_GET['where'] . ")" .
-			// " GROUP BY (" . $_GET['groupby'] . ")" .
-			// " HAVING (" . $_GET['having'] . ")" .
-			"",
-			$alltuples
-		);
+		$query = "SELECT " . $_GET['inputSelect'] . " FROM " . $_GET['inputFrom'];
+		if (!empty($_GET['inputWhereColumn'])) {
+			$tuple[":bind1"] = $_GET['inputWhereCompareTo'];
+			$query .= " WHERE (" . $_GET['inputWhereColumn'] . $_GET['inputWhereOp'] . ":bind1" . ")";
+		}
+		if (!empty($_GET['inputGroupBy'])) {
+			$query .= " GROUP BY (" . $_GET['inputGroupBy'] . ")";
+		}
+		if (!empty($_GET['inputHaving'])) {
+			$query .= " HAVING (" . $_GET['inputHaving'] . ")";
+		}
+		$results = executeBoundSQL($query, $alltuples);
 
 		if (oci_commit($db_conn)) {
 			// foreach ($results as $result) { }
