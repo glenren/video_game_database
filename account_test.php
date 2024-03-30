@@ -349,12 +349,14 @@ function run_sql_file($location)
 	    printResult($result);
 	}
     ?>
+	
     <hr />
     <h2>Select User</h2>
     <form method="GET" action="account_test.php">
         Username: <input type="text" name="insName"> <br /><br />
         <input type="submit" name="getAction" value="<?= $getLookUp ?>"></p>
     </form>
+
     <?php
 	if (isset($_POST['postAction'])) {
 		handlePOSTRequest();

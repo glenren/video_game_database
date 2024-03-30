@@ -32,27 +32,30 @@ $db_conn = NULL;	// login credentials are used in connectToDB()
 $success = true;	// keep track of errors so page redirects only if there are no errors
 $show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
 
-// Table list
-$tables = array(
-	"Dev" => array("name", "website"),
-	"Producer" => array("name"),
-	"Composer" => array("name", "genre", "instrument"),
-	"ArtDesign" => array("name", "artistrole", "style"),
-	"Programmer" => array("name", "task"),
-	"Publisher" => array("name", "location", "employees"),
-	"DevTeam" => array("name", "employees", "location"),
-	"AssociatedWith" => array("devteamname", "publishername"),
-	"Includes" => array("devteamname", "devname"),
-	"Platform" => array("name", "type"),
-	"VideoGameMadeBy" => array("gid", "name", "releasedate", "price", "category", "devteamname"),
-	"PlayedOn" => array("gid", "name"),
-	"ContainsDLC" => array("gid", "name", "price", "releasedate"),
-	"Account" => array("username", "email", "displayname", "creationdate"),
-	"Adds" => array("username", "gid", "status"),
-	"MakesReviewReviewing2" => array("length", "category"),
-	"MakesReviewReviewing1" => array("reviewid", "reviewdate", "rating", "length", "username", "gid"),
-	"MakesReviewReviewing3" => array("reviewid", "category"),
+connectToDB();
+$statement = executePlainSQL(
+	"SELECT table_name, column_name
+	FROM USER_TAB_COLUMNS"
 );
+oci_commit($db_conn);
+$nrows = oci_fetch_all($statement, $table_column_pair);
+$tables = array();
+foreach($table_column_pair['TABLE_NAME'] as $index => $tablename) {
+	if (!array_key_exists($tablename, $tables)) {
+		$tables[$tablename] = array();
+	}
+	array_push($tables[$tablename], $table_column_pair['COLUMN_NAME'][$index]);
+}
+var_dump($tables);
+disconnectFromDB();
+
+function debug_to_console($data) {
+    $output = $data;
+    if (is_array($output))
+        $output = implode(',', $output);
+
+    echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+}
 
 // Command strings for ORACLE
 $postReset = "reset";
@@ -260,41 +263,41 @@ function run_sql_file($location)
 	<title>CPSC 304 PHP/Oracle Demonstration</title>
 	<!-- setting the style for the nav bar. borrowed from https://www.w3schools.com/css/css_navbar_vertical.asp -->
 	<style>
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 200px;
-  background-color: #f1f1f1;
-}
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			width: 200px;
+			background-color: #f1f1f1;
+		}
 
-li a {
-  display: block;
-  color: #000;
-  padding: 8px 16px;
-  text-decoration: none;
-}
+		li a {
+			display: block;
+			color: #000;
+			padding: 8px 16px;
+			text-decoration: none;
+		}
 
-/* Change the link color on hover */
-li a:hover {
-  background-color: #555;
-  color: white;
-}
-</style>
+		/* Change the link color on hover */
+		li a:hover {
+			background-color: #555;
+			color: white;
+		}
+	</style>
 
 </head>
 <h1>Video Game Database</h1>
 <h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
 
 <body>
-<!-- navigation bar to go to different pages -->
+	<!-- navigation bar to go to different pages -->
 
-<ul>
-  <li><a href="#home">Home</a></li>
-  <li><a href="#news">Video Games</a></li>
-  <li><a href="account_test.php">Users</a></li>
-  <li><a href="#about">Dev Teams</a></li>
-</ul>
+	<ul>
+		<li><a href="#home">Home</a></li>
+		<li><a href="#news">Video Games</a></li>
+		<li><a href="account_test.php">Users</a></li>
+		<li><a href="#about">Dev Teams</a></li>
+	</ul>
 
 	<hr />
 	<h2>Reset</h2>
@@ -424,6 +427,7 @@ li a:hover {
 		$alltuples = array(
 			$tuple
 		);
+		$_GET['select'] = strtoupper($_GET['select']);
 		if (
 			!in_array($_GET['select'], $tables[$_GET['from']])
 			&& $_GET['select'] != "*"
@@ -456,14 +460,6 @@ li a:hover {
 		<input type="submit" name="getAction" value="display"></p>
 	</form>
 	<?php
-	function debug_to_console($data)
-	{
-		$output = $data;
-		if (is_array($output))
-			$output = implode(',', $output);
-
-		echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
-	}
 	function handleDisplayRequest()
 	{
 		global $db_conn;
