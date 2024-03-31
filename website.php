@@ -342,6 +342,7 @@ function run_sql_file($location)
 		Development Team: <input type="text" name="devteamName"> <br /><br />
 		<input type="submit" name="postAction" value="<?= $postInsert ?>"></p>
 	</form>
+	
 	<?php
 	function handleInsertRequest()
 	{
@@ -367,6 +368,32 @@ function run_sql_file($location)
 	}
 	?>
 
+	<hr />
+	<h2> Delete Video Game</h2>
+	<form method="POST" action="website.php">
+		Video Game Title: <input type="text" name="gameTitle"><br /><br />
+		<input type="submit" name="postAction" value="<?=$getCount ?>"></p>
+	</form>
+	
+	<?php
+function handleDeleteRequest()
+	{
+		global $db_conn;
+		//getting value from user and delete data from table
+		$tuple = array(
+			":bind1" => $_POST['gameTitle']
+		);
+		$alltuples = array(
+			$tuple
+		);
+		executeBoundSQL("DELETE FROM VideoGameMadeBy VALUES (:bind1", $alltuples);
+		
+		if (oci_commit($db_conn)) {
+			popUp("Successfully delete value from table!");
+		}
+	}
+	?>
+	
 	<hr />
 	<h2>Update Name in DemoTable</h2>
 	<p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
