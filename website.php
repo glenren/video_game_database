@@ -33,20 +33,36 @@ $success = true;	// keep track of errors so page redirects only if there are no 
 $show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
 
 connectToDB();
-$statement = executePlainSQL(
-	"SELECT table_name, column_name
-	FROM USER_TAB_COLUMNS"
-);
-oci_commit($db_conn);
-$nrows = oci_fetch_all($statement, $table_column_pair);
-$tables = array();
-foreach ($table_column_pair['TABLE_NAME'] as $index => $tablename) {
-	if (!array_key_exists($tablename, $tables)) {
-		$tables[$tablename] = array();
-	}
-	array_push($tables[$tablename], $table_column_pair['COLUMN_NAME'][$index]);
-}
+$pklist = fetch_table("
+SELECT UNIQUE cols.table_name, cols.column_name
+FROM USER_TAB_COLUMNS tab_col, user_constraints cons, user_cons_columns cols
+WHERE cols.table_name = tab_col.table_name
+AND cons.constraint_type = 'P'
+AND cons.constraint_name = cols.constraint_name
+AND cons.owner = cols.owner
+");
+$columnslist = fetch_table("
+SELECT tab_col.table_name, tab_col.column_name
+FROM USER_TAB_COLUMNS tab_col
+");
 disconnectFromDB();
+
+function fetch_table($query)
+{
+	global $db_conn;
+	$statement = executePlainSQL($query);
+	oci_commit($db_conn);
+	$table_column_pair = array();
+	$nrows = oci_fetch_all($statement, $table_column_pair);
+	$tables = array();
+	foreach ($table_column_pair['TABLE_NAME'] as $index => $tablename) {
+		if (!array_key_exists($tablename, $tables)) {
+			$tables[$tablename] = array();
+		}
+		array_push($tables[$tablename], $table_column_pair['COLUMN_NAME'][$index]);
+	}
+	return $tables;
+}
 
 function debug_to_console($data)
 {
@@ -395,14 +411,23 @@ function run_sql_file($location)
 	<hr />
 	<h2>General Query</h2>
 	<form method="GET" action="website.php">
-		FROM: <input type="text" name="inputFrom">
-		<!-- <select name="inputFrom">
+		FROM:
+		<!-- <input type="text" name="inputFrom"> -->
+		<select name="inputFrom">
 			<?php
-			// foreach ($tables as $table => $columns) {
-			// 	echo "<option value=\"" . $table . "\">" . $table . "</option>";
-			// }
+			$temp = $pklist;
+			foreach ($pklist as $table => $columns) {
+				unset($temp[$table]);
+				foreach ($temp as $table2 => $columns2) {
+					if (empty(array_intersect($columns, $columns2))) {
+						continue;
+					}
+					$joinOption = $table . "," . $table2;
+					echo "<option value=\"" . $joinOption . "\">" . $joinOption . "</option>";
+				}
+			}
 			?>
-		</select> -->
+		</select>
 		<br />
 		SELECT Column: <input type="text" name="inputSelect">
 		<br />
@@ -425,14 +450,14 @@ function run_sql_file($location)
 	// );
 	function areTokensOK()
 	{
-		global $tables;
+		global $pklist;
 		global $operators;
 
 		$_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
 		trim($_GET['inputFrom']);
 		$tablesFrom = preg_split("/,/", $_GET["inputFrom"]);
 		foreach ($tablesFrom as $table) {
-			if (!in_array($table, array_keys($tables))) {
+			if (!in_array($table, array_keys($pklist))) {
 				popUp("Invalid table");
 				return false;
 			}
@@ -440,13 +465,14 @@ function run_sql_file($location)
 
 		$_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
 		$inSelectedTables = false;
-		foreach ($tablesFrom as $table){
-			if (in_array($_GET['inputSelect'], $tables[$table])){
+		foreach ($tablesFrom as $table) {
+			if (in_array($_GET['inputSelect'], $pklist[$table])) {
 				$inSelectedTables = true;
 				break;
 			}
 		}
-		if (!$inSelectedTables
+		if (
+			!$inSelectedTables
 			&& $_GET['inputSelect'] != "*"
 		) {
 			popUp("Invalid Column");

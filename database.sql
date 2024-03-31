@@ -24,64 +24,65 @@ DROP TABLE MakesReviewReviewing3 CASCADE CONSTRAINTS;
 -- Now, add each table.
 --
 CREATE TABLE Dev (
-	Name VARCHAR(128),
+	DevName VARCHAR(128),
 	Website VARCHAR(128),
-	PRIMARY KEY (Name)
+	PRIMARY KEY (DevName)
 );
 CREATE TABLE Producer (
-	Name VARCHAR(128),
-	PRIMARY KEY (Name),
-	FOREIGN KEY (Name) REFERENCES Dev
+	DevName VARCHAR(128),
+	PRIMARY KEY (DevName),
+	FOREIGN KEY (DevName) REFERENCES Dev
 );
 CREATE TABLE Composer (
-	Name VARCHAR(128),
-	PRIMARY KEY (Name),
-	FOREIGN KEY (Name) REFERENCES Dev,
+	DevName VARCHAR(128),
+	PRIMARY KEY (DevName),
+	FOREIGN KEY (DevName) REFERENCES Dev,
 	Genre VARCHAR(128),
 	Instrument VARCHAR(128)
 );
 CREATE TABLE ArtDesign (
-	Name VARCHAR(128),
-	PRIMARY KEY (Name),
-	FOREIGN KEY (Name) REFERENCES Dev,
+	DevName VARCHAR(128),
+	PRIMARY KEY (DevName),
+	FOREIGN KEY (DevName) REFERENCES Dev,
 	ArtistRole VARCHAR(128),
 	Style VARCHAR(128)
 );
 CREATE TABLE Programmer (
-	Name VARCHAR(128),
-	PRIMARY KEY (Name),
-	FOREIGN KEY (Name) REFERENCES Dev,
+	DevName VARCHAR(128),
+	PRIMARY KEY (DevName),
+	FOREIGN KEY (DevName) REFERENCES Dev,
 	Task VARCHAR(128)
 );
 CREATE TABLE Publisher (
-	Name VARCHAR(128) PRIMARY KEY,
+	PublisherName VARCHAR(128),
 	Location VARCHAR(128),
+	PRIMARY KEY (PublisherName),
 	Employees INT
 );
 CREATE TABLE DevTeam (
-	Name VARCHAR(128),
+	DevTeamName VARCHAR(128),
 	Employees INT,
 	Location VARCHAR(128),
-	PRIMARY KEY (Name)
+	PRIMARY KEY (DevTeamName)
 );
 CREATE TABLE AssociatedWith (
 	DevTeamName VARCHAR(128),
 	PublisherName VARCHAR(128),
 	PRIMARY KEY (DevTeamName, PublisherName),
-	FOREIGN KEY (DevTeamName) REFERENCES DevTeam(Name),
-	FOREIGN KEY (PublisherName) REFERENCES Publisher(Name)
+	FOREIGN KEY (DevTeamName) REFERENCES DevTeam,
+	FOREIGN KEY (PublisherName) REFERENCES Publisher
 );
 CREATE TABLE Includes (
 	DevTeamName VARCHAR(128),
 	DevName VARCHAR(128),
 	PRIMARY KEY (DevTeamName, DevName),
-	FOREIGN KEY (DevTeamName) REFERENCES DevTeam(Name),
-	FOREIGN KEY (DevName) REFERENCES Dev (Name)
+	FOREIGN KEY (DevTeamName) REFERENCES DevTeam,
+	FOREIGN KEY (DevName) REFERENCES Dev
 );
 CREATE TABLE Platform (
-	Name VARCHAR(128),
+	PlatformName VARCHAR(128),
 	Type VARCHAR(128),
-	PRIMARY KEY (Name)
+	PRIMARY KEY (PlatformName)
 );
 CREATE TABLE VideoGameMadeBy (
 	GID INT,
@@ -95,17 +96,17 @@ CREATE TABLE VideoGameMadeBy (
 );
 CREATE TABLE PlayedOn (
 	GID INT,
-	Name VARCHAR(128),
-	PRIMARY KEY (GID, Name),
+	PlatformName VARCHAR(128),
+	PRIMARY KEY (GID, PlatformName),
 	FOREIGN KEY (GID) REFERENCES VideoGameMadeBy,
-	FOREIGN KEY (Name) REFERENCES Platform
+	FOREIGN KEY (PlatformName) REFERENCES Platform
 );
 CREATE TABLE ContainsDLC (
 	GID INT,
-	Name VARCHAR(128),
+	DLCName VARCHAR(128),
 	Price FLOAT(24),
 	ReleaseDate DATE,
-	PRIMARY KEY (GID, Name),
+	PRIMARY KEY (GID, DLCName),
 	FOREIGN KEY (GID) REFERENCES VideoGameMadeBy
 );
 CREATE TABLE Account (
@@ -147,193 +148,193 @@ CREATE TABLE MakesReviewReviewing3 (
 );
 -- done adding all of the tables, now add in some tuples
 -- Dev
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Ryota Niitsuma',
 		'https://www.mobygames.com/person/362265/ryota-niitsuma/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Tomohiko Imanishi',
 		'https://www.mobygames.com/person/364171/tomohiko-imanishi/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Azusa Shimada',
 		'https://www.mobygames.com/person/1108482/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Davor Hunski',
 		'https://www.mobygames.com/person/41188/davor-hunski/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Yohei Shimbori',
 		'https://www.mobygames.com/person/509159/yohei-shimbori/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Atsushi Kitajoh',
 		'https://www.mobygames.com/person/364191/atsushi-kitajoh/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Takuji Kawano',
 		'https://www.mobygames.com/person/98565/takuji-kawano/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Hiromi Sagara',
 		'https://www.mobygames.com/person/484529/hiromi-sagara/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Oguchi',
 		'https://www.mobygames.com/person/1101660/oguchi/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Yusuke Kozaki',
 		'https://www.mobygames.com/person/406971/yusuke-kozaki/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Toru Narihiro',
 		'https://www.mobygames.com/person/534705/toru-narihiro/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Hitoshi Yamagami',
 		'https://www.mobygames.com/person/50693/hitoshi-yamagami/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Hiroki Morishita',
 		'https://www.mobygames.com/person/609076/hiroki-morishita/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Keiichi Okabe',
 		'https://www.mobygames.com/person/129821/keiichi-okabe/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Yoshinori Kawamoto',
 		'https://www.mobygames.com/person/178444/yoshinori-kawamoto/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Keigo Hoashi',
 		'https://www.mobygames.com/person/600583/keigo-hoashi/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Ryo Onishi',
 		'https://www.mobygames.com/person/710385/ryo-onishi/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Takashi Wagatsuma',
 		'https://www.mobygames.com/person/565395/takashi-wagatsuma/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Misa Yasui',
 		'https://www.mobygames.com/person/729004/misa-yasui/'
 	);
-INSERT INTO Dev(Name, Website)
+INSERT INTO Dev(DevName, Website)
 VALUES (
 		'Takahiro Kitagawa',
 		'https://www.mobygames.com/person/1083697/takahiro-kitagawa/'
 	);
 -- Producers
-INSERT INTO Producer(Name)
+INSERT INTO Producer(DevName)
 VALUES ('Ryota Niitsuma');
-INSERT INTO Producer(Name)
+INSERT INTO Producer(DevName)
 VALUES ('Davor Hunski');
-INSERT INTO Producer(Name)
+INSERT INTO Producer(DevName)
 VALUES ('Yohei Shimbori');
-INSERT INTO Producer(Name)
+INSERT INTO Producer(DevName)
 VALUES ('Toru Narihiro');
-INSERT INTO Producer(Name)
+INSERT INTO Producer(DevName)
 VALUES ('Hitoshi Yamagami');
 -- Composer
-INSERT INTO Composer(Name, Genre, Instrument)
+INSERT INTO Composer(DevName, Genre, Instrument)
 VALUES ('Atsushi Kitajoh', 'Jazz', 'Varied');
-INSERT INTO Composer(Name, Genre, Instrument)
+INSERT INTO Composer(DevName, Genre, Instrument)
 VALUES ('Hiroki Morishita', 'Battle', 'Varied');
-INSERT INTO Composer(Name, Genre, Instrument)
+INSERT INTO Composer(DevName, Genre, Instrument)
 VALUES ('Keiichi Okabe', 'Battle', 'Varied');
-INSERT INTO Composer(Name, Genre, Instrument)
+INSERT INTO Composer(DevName, Genre, Instrument)
 VALUES ('Yoshinori Kawamoto', 'Battle', 'Varied');
-INSERT INTO Composer(Name, Genre, Instrument)
+INSERT INTO Composer(DevName, Genre, Instrument)
 VALUES ('Keigo Hoashi', 'Battle', 'Varied');
 -- ArtDesign
-INSERT INTO ArtDesign(Name, ArtistRole, Style)
+INSERT INTO ArtDesign(DevName, ArtistRole, Style)
 VALUES (
 		'Azusa Shimada',
 		'Lead 2D character design',
 		'anime'
 	);
-INSERT INTO ArtDesign(Name, ArtistRole, Style)
+INSERT INTO ArtDesign(DevName, ArtistRole, Style)
 VALUES (
 		'Takuji Kawano',
 		'Character Concept Artist',
 		'anime'
 	);
-INSERT INTO ArtDesign(Name, ArtistRole, Style)
+INSERT INTO ArtDesign(DevName, ArtistRole, Style)
 VALUES (
 		'Hiromi Sagara',
 		'Character Concept Artist',
 		'anime'
 	);
-INSERT INTO ArtDesign(Name, ArtistRole, Style)
+INSERT INTO ArtDesign(DevName, ArtistRole, Style)
 VALUES ('Oguchi', 'Character Designer', 'anime');
-INSERT INTO ArtDesign(Name, ArtistRole, Style)
+INSERT INTO ArtDesign(DevName, ArtistRole, Style)
 VALUES ('Yusuke Kozaki', 'Character Designer', 'anime');
 -- Programmer
-INSERT INTO Programmer(Name, Task)
+INSERT INTO Programmer(DevName, Task)
 VALUES ('Tomohiko Imanishi', 'Chief Programmer');
-INSERT INTO Programmer(Name, Task)
+INSERT INTO Programmer(DevName, Task)
 VALUES ('Ryo Onishi', 'Lead Programmer');
-INSERT INTO Programmer(Name, Task)
+INSERT INTO Programmer(DevName, Task)
 VALUES ('Takashi Wagatsuma', 'Game Programmer');
-INSERT INTO Programmer(Name, Task)
+INSERT INTO Programmer(DevName, Task)
 VALUES ('Misa Yasui', 'System Programmer');
-INSERT INTO Programmer(Name, Task)
+INSERT INTO Programmer(DevName, Task)
 VALUES ('Takahiro Kitagawa', 'Sound Programmer');
 -- Publisher
-INSERT INTO Publisher(Name, Location, Employees)
+INSERT INTO Publisher(PublisherName, Location, Employees)
 VALUES ('Sega', 'Tokyo, Japan', '3459');
-INSERT INTO Publisher(Name, Location, Employees)
+INSERT INTO Publisher(PublisherName, Location, Employees)
 VALUES ('Devolver Digital', 'Texas, US', '235');
-INSERT INTO Publisher(Name, Location, Employees)
+INSERT INTO Publisher(PublisherName, Location, Employees)
 VALUES (
 		'Bandai Namco Entertainment',
 		'Tokyo, Japan',
 		'710'
 	);
-INSERT INTO Publisher(Name, Location, Employees)
+INSERT INTO Publisher(PublisherName, Location, Employees)
 VALUES ('Square Enix', 'Tokyo, Japan', '4712');
-INSERT INTO Publisher(Name, Location, Employees)
+INSERT INTO Publisher(PublisherName, Location, Employees)
 VALUES ('Annapurna Interactive', 'California, USA', '25');
-INSERT INTO Publisher(Name, Location, Employees)
+INSERT INTO Publisher(PublisherName, Location, Employees)
 VALUES ('Maddy Makes Games', 'null', '10');
 -- DevTeam
-INSERT INTO DevTeam(Name, Employees, Location)
+INSERT INTO DevTeam(DevTeamName, Employees, Location)
 VALUES ('Atlus', '338', 'Tokyo, Japan');
-INSERT INTO DevTeam(Name, Employees, Location)
+INSERT INTO DevTeam(DevTeamName, Employees, Location)
 VALUES ('Croteam', '42', 'Zagreb, Croatia');
-INSERT INTO DevTeam(Name, Employees, Location)
+INSERT INTO DevTeam(DevTeamName, Employees, Location)
 VALUES (
 		'Bandai Namco Studios Inc.',
 		'1219',
 		'Tokyo, Japan'
 	);
-INSERT INTO DevTeam(Name, Employees, Location)
+INSERT INTO DevTeam(DevTeamName, Employees, Location)
 VALUES ('Arc System Works', '180', 'Yokohama, Japan');
-INSERT INTO DevTeam(Name, Employees, Location)
+INSERT INTO DevTeam(DevTeamName, Employees, Location)
 VALUES ('Maddy Makes Games', '10', 'null');
 -- AssociatedWith
 INSERT INTO AssociatedWith(DevTeamName, PublisherName)
@@ -361,15 +362,15 @@ VALUES ('Croteam', 'Davor Hunski');
 INSERT INTO Includes(DevTeamName, DevName)
 VALUES ('Bandai Namco Studios Inc.', 'Yohei Shimbori');
 -- Platform
-INSERT INTO Platform(Name, Type)
+INSERT INTO Platform(PlatformName, Type)
 VALUES ('Steam', 'PC');
-INSERT INTO Platform(Name, Type)
+INSERT INTO Platform(PlatformName, Type)
 VALUES ('Nintendo Switch', 'Console');
-INSERT INTO Platform(Name, Type)
+INSERT INTO Platform(PlatformName, Type)
 VALUES ('Play Store', 'Mobile');
-INSERT INTO Platform(Name, Type)
+INSERT INTO Platform(PlatformName, Type)
 VALUES ('3DS', 'Portable');
-INSERT INTO Platform(Name, Type)
+INSERT INTO Platform(PlatformName, Type)
 VALUES ('Playstation 5', 'Console');
 -- VideoGameMadeBy
 INSERT INTO VideoGameMadeBy(
@@ -469,48 +470,48 @@ VALUES (
 		'Maddy Makes Games'
 	);
 -- PlayedOn
-INSERT INTO PlayedOn(GID, Name)
+INSERT INTO PlayedOn(GID, PlatformName)
 VALUES ('216878', 'Steam');
-INSERT INTO PlayedOn(GID, Name)
+INSERT INTO PlayedOn(GID, PlatformName)
 VALUES ('1382330', 'Nintendo Switch');
-INSERT INTO PlayedOn(GID, Name)
+INSERT INTO PlayedOn(GID, PlatformName)
 VALUES ('257510', 'Steam');
-INSERT INTO PlayedOn(GID, Name)
+INSERT INTO PlayedOn(GID, PlatformName)
 VALUES ('1778820', 'Steam');
-INSERT INTO PlayedOn(GID, Name)
+INSERT INTO PlayedOn(GID, PlatformName)
 VALUES ('101945', 'Steam');
-INSERT INTO PlayedOn(GID, Name)
+INSERT INTO PlayedOn(GID, PlatformName)
 VALUES ('504230', 'Nintendo Switch');
 -- ContainsDLC
-INSERT INTO ContainsDLC(GID, Name, Price, ReleaseDate)
+INSERT INTO ContainsDLC(GID, DLCName, Price, ReleaseDate)
 VALUES (
 		'101945',
 		'Dragon Ball FighterZ: Broly',
 		'4.99',
 		TO_DATE('2018-03-28', 'yyyy/mm/dd')
 	);
-INSERT INTO ContainsDLC(GID, Name, Price, ReleaseDate)
+INSERT INTO ContainsDLC(GID, DLCName, Price, ReleaseDate)
 VALUES (
 		'101945',
 		'Dragon Ball FighterZ: Android 21 (Lab Coat)',
 		'4.99',
 		TO_DATE('2022-02-23', 'yyyy/mm/dd')
 	);
-INSERT INTO ContainsDLC(GID, Name, Price, ReleaseDate)
+INSERT INTO ContainsDLC(GID, DLCName, Price, ReleaseDate)
 VALUES (
 		'101945',
 		'Dragon Ball FighterZ: Vegito (SSGSS)',
 		'4.99',
 		TO_DATE('2018-05-31', 'yyyy/mm/dd')
 	);
-INSERT INTO ContainsDLC(GID, Name, Price, ReleaseDate)
+INSERT INTO ContainsDLC(GID, DLCName, Price, ReleaseDate)
 VALUES (
 		'101945',
 		'Dragon Ball FighterZ: Bardock',
 		'4.99',
 		TO_DATE('2018-03-28', 'yyyy/mm/dd')
 	);
-INSERT INTO ContainsDLC(GID, Name, Price, ReleaseDate)
+INSERT INTO ContainsDLC(GID, DLCName, Price, ReleaseDate)
 VALUES (
 		'101945',
 		'Dragon Ball FighterZ: Goku (Ultra Instinct)',
