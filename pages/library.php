@@ -264,14 +264,14 @@ function run_sql_file($location)
     );
 }
 
-// $operators = array(
-// 	"=",
-// 	"<>",
-// 	">",
-// 	">=",
-// 	"<",
-// 	"<=",
-// );
+$operators = array(
+	"=",
+	"<>",
+	">",
+	">=",
+	"<",
+	"<=",
+);
 function areTokensOK()
 {
     global $pklist;

@@ -32,9 +32,17 @@ function handleSPJRequest()
     if (!areTokensOK()) {
         return;
     }
-    $query = "SELECT " . $_GET['inputSelect'] . " FROM " . $_GET['inputFrom'];
-    if (!empty($_GET['inputWhere'])) {
-        $query .= " WHERE (" . $_GET['inputWhere'] . ")";
+    $query = "SELECT " . $_GET['inputSelect'] .
+        " FROM " . $_GET['inputFrom'];
+    if (!empty($_GET['inputWhereVal2'])) {
+        $val2 = $_GET['inputWhereVal2'];
+        if (!ctype_digit($_GET['inputWhereOp'])) {
+            $val2 = "'" . $val2 ."'";
+        }
+        $query .= " WHERE (" . $_GET['inputWhereVal1'] .
+            $_GET['inputWhereOp'] .
+            $val2 .
+            ")";
     }
     $results = executePlainSQL($query);
 
@@ -101,7 +109,32 @@ function handleSPJRequest()
         ?>
     </select>
     <br />
-    WHERE Column: <input type="text" name="inputWhere">
+    WHERE Column:
+    <select name="inputWhereVal1">
+        <?php
+        foreach ($columnslist as $table => $columns) {
+            foreach ($columns as $column) {
+                $class1 = "selectOption" . $table;
+                $class2 = "selectOption";
+                echo "<option " .
+                    "style=\"display:none\" " .
+                    "class=\"" . $class1 . " " . $class2 . "\" " .
+                    "value=\"" . $table . "." . $column . "\"" .
+                    ">" . $table . "." . $column . "</option>";
+            }
+        }
+        ?>
+    </select>
+    <select name="inputWhereOp">
+        <?php
+        foreach ($operators as $operator) {
+            echo "<option " .
+                "value=\"" . $operator . "\"" .
+                ">" . $operator . "</option>";
+        }
+        ?>
+    </select>
+    <input name="inputWhereVal2">
     <br />
     <input type="submit" name="getAction" value="<?= $getSPJ ?>"></p>
 </form>
