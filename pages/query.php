@@ -178,15 +178,3 @@ function printResult($result)
 <form method="GET" action="query.php">
     <input type="submit" name="getAction" value="display"></p>
 </form>
-
-
-
-<?php
-if (isset($_POST['postAction'])) {
-    handlePOSTRequest();
-} else if (
-    isset($_GET['getAction'])
-) {
-    handleGETRequest();
-}
-?>

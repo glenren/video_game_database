@@ -83,15 +83,3 @@ function handleUpdateRequest()
     New Name: <input type="text" name="newName"> <br /><br />
     <input type="submit" name="postAction" value="<?= $postUpdate ?>"></p>
 </form>
-
-
-
-<?php
-if (isset($_POST['postAction'])) {
-    handlePOSTRequest();
-} else if (
-    isset($_GET['getAction'])
-) {
-    handleGETRequest();
-}
-?>
