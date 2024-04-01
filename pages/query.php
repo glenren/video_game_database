@@ -4,9 +4,16 @@ function handleCountRequest()
 {
     global $db_conn;
     $result = executePlainSQL("SELECT Count(*) FROM VideoGameMadeBy");
-    if (($row = oci_fetch_row($result)) != false) {
+
+    global $success;
+    if (
+        $success
+        && ($row = oci_fetch_row($result)) != false
+    ) {
         // echo "<br> The number of video games in database: " . $row[0] . "<br>";
         popUp("The number of video games in database: " . $row[0]);
+    } else {
+        popUp("Database Error");
     }
 }
 ?>
@@ -30,9 +37,13 @@ function handleSPJRequest()
         $query .= " WHERE (" . $_GET['inputWhere'] . ")";
     }
     $results = executePlainSQL($query);
-    if (oci_commit($db_conn)) {
+
+    global $success;
+    if ($success) {
+        popUp("Success");
         printResult($results);
-        popUp("Success!");
+    } else {
+        popUp("Database Error");
     }
 }
 ?>
@@ -84,7 +95,7 @@ function handleSPJRequest()
                     "style=\"display:none\" " .
                     "class=\"" . $class1 . " " . $class2 . "\" " .
                     "value=\"" . $table . "." . $column . "\"" .
-                    ">" . $column . "</option>";
+                    ">" . $table . "." . $column . "</option>";
             }
         }
         ?>
@@ -117,10 +128,12 @@ function handleQueryRequest()
     }
     $results = executePlainSQL($query);
 
-    if (oci_commit($db_conn)) {
-        // foreach ($results as $result) { }
+    global $success;
+    if ($success) {
+        popUp("Success");
         printResult($results);
-        popUp("Success!");
+    } else {
+        popUp("Database Error");
     }
 }
 ?>

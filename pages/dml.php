@@ -15,9 +15,15 @@ function handleInsertRequest()
         $tuple
     );
     executeBoundSQL("INSERT INTO VideoGameMadeBy VALUES (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
-    // oci_commit($db_conn);
-    if (oci_commit($db_conn)) {
+
+    global $success;
+    if (
+        $success
+        && oci_commit($db_conn)
+    ) {
         popUp("Successfully inserted your values into the table!");
+    } else {
+        popUp("Database Error");
     }
 }
 ?>
@@ -49,7 +55,9 @@ function handleDeleteRequest()
     executeBoundSQL("DELETE FROM VideoGameMadeBy VALUES (:bind1", $alltuples);
 
     if (oci_commit($db_conn)) {
-        popUp("Successfully delete value from table!");
+        popUp("Successfully deleted value from table!");
+    } else {
+        popUp("Database Error");
     }
 }
 ?>
@@ -68,10 +76,15 @@ function handleUpdateRequest()
     $new_name = $_POST['newName'];
     // you need the wrap the old name and new name values with single quotations
     executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
-    // oci_commit($db_conn);
 
-    if (oci_commit($db_conn)) {
+    global $success;
+    if (
+        $success
+        && oci_commit($db_conn)
+    ) {
         popUp("Successfully updated value!");
+    } else {
+        popUp("Database Error");
     }
 }
 ?>
