@@ -23,7 +23,7 @@ function handleInsertRequest()
 ?>
 <hr />
 <h2>Add A Video Game</h2>
-<form method="POST" action="dml.php">
+<form method="POST" action="index.php">
     GID: <input type="text" name="GID"> <br /><br />
     Video Game Title: <input type="text" name="gameTitle"> <br /><br />
     Release Date: <input type="text" name="releaseDate"> <br /><br />
@@ -55,7 +55,7 @@ function handleDeleteRequest()
 ?>
 <hr />
 <h2> Delete Video Game</h2>
-<form method="POST" action="dml.php">
+<form method="POST" action="index.php">
     Video Game Title: <input type="text" name="gameTitle"><br /><br />
     <input type="submit" name="postAction" value="<?= $getCount ?>"></p>
 </form>
@@ -78,7 +78,7 @@ function handleUpdateRequest()
 <hr />
 <h2>Update Name in DemoTable</h2>
 <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
-<form method="POST" action="dml.php">
+<form method="POST" action="index.php">
     Old Name: <input type="text" name="oldName"> <br /><br />
     New Name: <input type="text" name="newName"> <br /><br />
     <input type="submit" name="postAction" value="<?= $postUpdate ?>"></p>

@@ -11,7 +11,7 @@ function handleCountRequest()
 }
 ?>
 <h2>Number of Video Games in Database</h2>
-<form method="GET" action="query.php">
+<form method="GET" action="index.php">
     <input type="submit" name="getAction" value="<?= $getCount ?>"></p>
 </form>
 
@@ -38,7 +38,7 @@ function handleSPJRequest()
 ?>
 <hr />
 <h2>SELECT PROJECT JOIN Query</h2>
-<form method="GET" action="query.php">
+<form method="GET" action="index.php">
     FROM:
     <select name="inputFrom" onChange="switchSelect(this);">
         <?php
@@ -103,7 +103,7 @@ function handleQueryRequest()
 ?>
 <hr />
 <h2>General Query</h2>
-<form method="GET" action="query.php">
+<form method="GET" action="index.php">
     FROM:
     <!-- <input type="text" name="inputFrom"> -->
     <select name="inputFrom">
@@ -175,6 +175,6 @@ function printResult($result)
 ?>
 <hr />
 <h2>Display Tuples in DemoTable</h2>
-<form method="GET" action="query.php">
+<form method="GET" action="index.php">
     <input type="submit" name="getAction" value="display"></p>
 </form>
