@@ -56,15 +56,38 @@ function handleSPJRequest()
         ?>
     </select>
     <script>
-        function switchSelect(test) {
-            console.log(test.value);
+        function switchSelect(htmlFrom) {
+            elements = document.getElementsByClassName("selectOption");
+            for (let option of elements) {
+                option.style.display = "none";
+            }
+
+            let tables = htmlFrom.value.split(",");
+            tables.forEach(table => {
+                elements = document.getElementsByClassName("selectOption" + table);
+                for (let option of elements) {
+                    option.style.display = "block";
+                }
+            });
         }
     </script>
     <br />
     SELECT Column:
-    <input type="text" name="inputSelect">
     <select name="inputSelect">
-
+        <option value="*">*</option>
+        <?php
+        foreach ($columnslist as $table => $columns) {
+            foreach ($columns as $column) {
+                $class1 = "selectOption" . $table;
+                $class2 = "selectOption";
+                echo "<option " .
+                    "style=\"display:none\" " .
+                    "class=\"" . $class1 . " " . $class2 . "\" " .
+                    "value=\"" . $table . "." . $column . "\"" .
+                    ">" . $column . "</option>";
+            }
+        }
+        ?>
     </select>
     <br />
     WHERE Column: <input type="text" name="inputWhere">

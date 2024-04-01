@@ -1,4 +1,48 @@
 <?php
+// The following 3 lines allow PHP errors to be displayed along with the page content.
+// Delete or comment out this block when it's no longer needed.
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Database access configuration
+$creds = fopen("credentials.txt", "r") or die("Unable to open file!");
+$config["dbuser"] = trim(fgets($creds));
+$config["dbpassword"] = trim(fgets($creds));
+$config["dbserver"] = "dbhost.students.cs.ubc.ca:1522/stu";
+fclose($creds);
+$db_conn = NULL;	// login credentials are used in connectToDB()
+$success = true;	// keep track of errors so page redirects only if there are no errors
+$show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
+
+connectToDB();
+$pklist = fetch_table("
+SELECT UNIQUE cols.table_name, cols.column_name
+FROM USER_TAB_COLUMNS tab_col, user_constraints cons, user_cons_columns cols
+WHERE cols.table_name = tab_col.table_name
+AND cons.constraint_type = 'P'
+AND cons.constraint_name = cols.constraint_name
+AND cons.owner = cols.owner
+");
+$columnslist = fetch_table("
+SELECT tab_col.table_name, tab_col.column_name
+FROM USER_TAB_COLUMNS tab_col
+");
+disconnectFromDB();
+
+// Command strings for ORACLE
+$postReset = "reset";
+$postInsert = 'insert';
+$postUpdate = 'update';
+$getCount = 'count';
+$getDisplay = 'display';
+$getSPJ = 'SPJ';
+$getQuery = 'query';
+?>
+
+
+
+<?php
 function fetch_table($query)
 {
     global $db_conn;
@@ -231,6 +275,7 @@ function run_sql_file($location)
 function areTokensOK()
 {
     global $pklist;
+    global $columnslist;
     global $operators;
 
     $_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
@@ -246,7 +291,9 @@ function areTokensOK()
     $_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
     $inSelectedTables = false;
     foreach ($tablesFrom as $table) {
-        if (in_array($_GET['inputSelect'], $pklist[$table])) {
+        $column = preg_split("/\./", $_GET['inputSelect'])[1];
+        var_dump($column);
+        if (in_array($column, $columnslist[$table])) {
             $inSelectedTables = true;
             break;
         }
@@ -271,50 +318,6 @@ function areTokensOK()
     // }
     return true;
 }
-?>
-
-
-
-<?php
-// The following 3 lines allow PHP errors to be displayed along with the page content.
-// Delete or comment out this block when it's no longer needed.
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Database access configuration
-$creds = fopen("credentials.txt", "r") or die("Unable to open file!");
-$config["dbuser"] = trim(fgets($creds));
-$config["dbpassword"] = trim(fgets($creds));
-$config["dbserver"] = "dbhost.students.cs.ubc.ca:1522/stu";
-fclose($creds);
-$db_conn = NULL;	// login credentials are used in connectToDB()
-$success = true;	// keep track of errors so page redirects only if there are no errors
-$show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
-
-connectToDB();
-$pklist = fetch_table("
-SELECT UNIQUE cols.table_name, cols.column_name
-FROM USER_TAB_COLUMNS tab_col, user_constraints cons, user_cons_columns cols
-WHERE cols.table_name = tab_col.table_name
-AND cons.constraint_type = 'P'
-AND cons.constraint_name = cols.constraint_name
-AND cons.owner = cols.owner
-");
-$columnslist = fetch_table("
-SELECT tab_col.table_name, tab_col.column_name
-FROM USER_TAB_COLUMNS tab_col
-");
-disconnectFromDB();
-
-// Command strings for ORACLE
-$postReset = "reset";
-$postInsert = 'insert';
-$postUpdate = 'update';
-$getCount = 'count';
-$getDisplay = 'display';
-$getSPJ = 'SPJ';
-$getQuery = 'query';
 ?>
 
 
