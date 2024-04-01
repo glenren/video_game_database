@@ -79,6 +79,7 @@ $postInsert = 'insert';
 $postUpdate = 'update';
 $getCount = 'count';
 $getDisplay = 'display';
+$getSPJ = 'SPJ';
 $getQuery = 'query';
 
 // Other functions
@@ -215,6 +216,7 @@ function handleGETRequest()
 	global $getCount;
 	global $getDisplay;
 	global $getQuery;
+	global $getSPJ;
 	if (connectToDB()) {
 		switch ($_GET['getAction']) {
 			case $getCount:
@@ -222,6 +224,9 @@ function handleGETRequest()
 				break;
 			case $getDisplay:
 				handleDisplayRequest();
+				break;
+			case $getSPJ:
+				handleSPJRequest();
 				break;
 			case $getQuery:
 				handleQueryRequest();
@@ -270,6 +275,58 @@ function run_sql_file($location)
 		"total" => $total
 	);
 }
+
+// $operators = array(
+// 	"=",
+// 	"<>",
+// 	">",
+// 	">=",
+// 	"<",
+// 	"<=",
+// );
+function areTokensOK()
+{
+	global $pklist;
+	global $operators;
+
+	$_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
+	trim($_GET['inputFrom']);
+	$tablesFrom = preg_split("/,/", $_GET["inputFrom"]);
+	foreach ($tablesFrom as $table) {
+		if (!in_array($table, array_keys($pklist))) {
+			popUp("Invalid table");
+			return false;
+		}
+	}
+
+	$_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
+	$inSelectedTables = false;
+	foreach ($tablesFrom as $table) {
+		if (in_array($_GET['inputSelect'], $pklist[$table])) {
+			$inSelectedTables = true;
+			break;
+		}
+	}
+	if (
+		!$inSelectedTables
+		&& $_GET['inputSelect'] != "*"
+	) {
+		popUp("Invalid Column");
+		return false;
+	}
+
+	// $conditionList = preg_split("/(and)|(or)/i", $_GET['inputWhere']);
+	// foreach ($conditionList as $condition) {
+	// 	$pieces = preg_split("/\s*/", $condition);
+	// 	foreach ($pieces as $piece) {
+	// 		if (!in_array($piece, $tablesFrom)
+	// 			&& !in_array($piece, $operators)) {
+	// 				return false;
+	// 		}
+	// 	}
+	// }
+	return true;
+}
 ?>
 
 <html>
@@ -306,8 +363,11 @@ function run_sql_file($location)
 <h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
 
 <body>
+	<script>
+		var pklist = <?php echo json_encode($pklist)?>;
+		var columnslist = <?php echo json_encode($columnslist)?>;
+	</script>
 	<!-- navigation bar to go to different pages -->
-
 	<ul>
 		<li><a href="#home">Home</a></li>
 		<li><a href="#news">Video Games</a></li>
@@ -342,7 +402,7 @@ function run_sql_file($location)
 		Development Team: <input type="text" name="devteamName"> <br /><br />
 		<input type="submit" name="postAction" value="<?= $postInsert ?>"></p>
 	</form>
-	
+
 	<?php
 	function handleInsertRequest()
 	{
@@ -372,11 +432,11 @@ function run_sql_file($location)
 	<h2> Delete Video Game</h2>
 	<form method="POST" action="website.php">
 		Video Game Title: <input type="text" name="gameTitle"><br /><br />
-		<input type="submit" name="postAction" value="<?=$getCount ?>"></p>
+		<input type="submit" name="postAction" value="<?= $getCount ?>"></p>
 	</form>
-	
+
 	<?php
-function handleDeleteRequest()
+	function handleDeleteRequest()
 	{
 		global $db_conn;
 		//getting value from user and delete data from table
@@ -387,13 +447,13 @@ function handleDeleteRequest()
 			$tuple
 		);
 		executeBoundSQL("DELETE FROM VideoGameMadeBy VALUES (:bind1", $alltuples);
-		
+
 		if (oci_commit($db_conn)) {
 			popUp("Successfully delete value from table!");
 		}
 	}
 	?>
-	
+
 	<hr />
 	<h2>Update Name in DemoTable</h2>
 	<p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
@@ -436,6 +496,61 @@ function handleDeleteRequest()
 	?>
 
 	<hr />
+	<h2>SELECT PROJECT JOIN Query</h2>
+	<form method="GET" action="website.php">
+		FROM:
+		<select name="inputFrom" onChange="switchSelect(this);">
+			<?php
+			$temp = $pklist;
+			foreach ($pklist as $table => $columns) {
+				unset($temp[$table]);
+				foreach ($temp as $table2 => $columns2) {
+					if (empty(array_intersect($columns, $columns2))) {
+						continue;
+					}
+					$joinOption = $table . "," . $table2;
+					echo "<option value=\"" . $joinOption . "\">" . $joinOption . "</option>";
+				}
+			}
+			?>
+		</select>
+		<script>
+			function switchSelect(test) {
+				console.log(test.value);
+			}
+		</script>
+		<br />
+		SELECT Column:
+		<input type="text" name="inputSelect">
+		<select name="inputSelect">
+			
+		</select>
+		<br />
+		WHERE Column: <input type="text" name="inputWhere">
+		<br />
+		<input type="submit" name="getAction" value="<?= $getSPJ ?>"></p>
+	</form>
+	<?php
+	function handleSPJRequest()
+	{
+		global $db_conn;
+		// Sanitize table and column names
+		if (!areTokensOK()) {
+			return;
+		}
+		$query = "SELECT " . $_GET['inputSelect'] . " FROM " . $_GET['inputFrom'];
+		if (!empty($_GET['inputWhere'])) {
+			$query .= " WHERE (" . $_GET['inputWhere'] . ")";
+		}
+		$results = executePlainSQL($query);
+		if (oci_commit($db_conn)) {
+			printResult($results);
+			popUp("Success!");
+		}
+	}
+	?>
+
+	<hr />
 	<h2>General Query</h2>
 	<form method="GET" action="website.php">
 		FROM:
@@ -467,68 +582,9 @@ function handleDeleteRequest()
 		<input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
 	</form>
 	<?php
-	// $operators = array(
-	// 	"=",
-	// 	"<>",
-	// 	">",
-	// 	">=",
-	// 	"<",
-	// 	"<=",
-	// );
-	function areTokensOK()
-	{
-		global $pklist;
-		global $operators;
-
-		$_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
-		trim($_GET['inputFrom']);
-		$tablesFrom = preg_split("/,/", $_GET["inputFrom"]);
-		foreach ($tablesFrom as $table) {
-			if (!in_array($table, array_keys($pklist))) {
-				popUp("Invalid table");
-				return false;
-			}
-		}
-
-		$_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
-		$inSelectedTables = false;
-		foreach ($tablesFrom as $table) {
-			if (in_array($_GET['inputSelect'], $pklist[$table])) {
-				$inSelectedTables = true;
-				break;
-			}
-		}
-		if (
-			!$inSelectedTables
-			&& $_GET['inputSelect'] != "*"
-		) {
-			popUp("Invalid Column");
-			return false;
-		}
-
-		// $conditionList = preg_split("/(and)|(or)/i", $_GET['inputWhere']);
-		// foreach ($conditionList as $condition) {
-		// 	$pieces = preg_split("/\s*/", $condition);
-		// 	foreach ($pieces as $piece) {
-		// 		if (!in_array($piece, $tablesFrom)
-		// 			&& !in_array($piece, $operators)) {
-		// 				return false;
-		// 		}
-		// 	}
-		// }
-		return true;
-	}
 	function handleQueryRequest()
 	{
 		global $db_conn;
-		//Getting the values from user and insert data into the table
-		$tuple = array(
-			":bind2" => $_GET['inputGroupBy'],
-			":bind3" => $_GET['inputHaving']
-		);
-		$alltuples = array(
-			$tuple
-		);
 		// Sanitize table and column names
 		if (!areTokensOK()) {
 			return;
@@ -543,7 +599,7 @@ function handleDeleteRequest()
 		if (!empty($_GET['inputHaving'])) {
 			$query .= " HAVING (" . $_GET['inputHaving'] . ")";
 		}
-		$results = executeBoundSQL($query, $alltuples);
+		$results = executePlainSQL($query);
 
 		if (oci_commit($db_conn)) {
 			// foreach ($results as $result) { }
@@ -566,7 +622,6 @@ function handleDeleteRequest()
 		$commands = sql_file_to_array("select.sql");
 		foreach ($commands as $command) {
 			if (trim($command)) {
-				debug_to_console($command);
 				$result = executePlainSQL($command);
 				oci_commit($db_conn);
 				printResult($result);
@@ -584,7 +639,6 @@ function handleDeleteRequest()
 				if (!$headerPrinted) {
 					$header = $header . "<th>" . $key . "</th>";
 				}
-				debug_to_console($tuple);
 				$tuple = $tuple . "<td>" . $value . "</td>";
 			}
 			$tuple = $tuple . "</tr>";
