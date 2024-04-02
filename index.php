@@ -18,48 +18,6 @@
 require("pages/library.php");
 ?>
 
-<!-- <html>
-
-<head>
-<link rel="stylesheet" href="../style.css">
-    <!-- setting the style for the nav bar. borrowed from https://www.w3schools.com/css/css_navbar_vertical.asp -->
-    <!-- <style>
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            width: 200px;
-            background-color: #f1f1f1;
-        }
-
-        li a {
-            display: block;
-            color: #000;
-            padding: 8px 16px;
-            text-decoration: none;
-        }
-
-        /* Change the link color on hover */
-        li a:hover {
-            background-color: #555;
-            color: white;
-        }
-    </style>
-</head>
-
-<body> -->
-<!-- <h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2> -->
-
-<!-- navigation bar to go to different pages -->
-<!-- <ul>
-<li><a href="index.php">Home</a></li>
-<li><a href="#news">Video Games</a></li>
-<li><a href="pages/account_test.php">Users</a></li>
-<li><a href="#about">Dev Teams</a></li>
-</ul>
-</body>
-<html> -->
-
 <html>
 <head>
 	<script>
