@@ -242,14 +242,20 @@ function run_sql_file($location)
 <li><a class="active" href="account_test.php">Users</a></li>
 <li><a href="#about">Dev Teams</a></li>
 </ul></div>
-<div class="main"><h1>Users</h1>
-	<div class="bubble"><h2>Reset</h2>
-	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you
-		MUST use reset</p>
-	<form method="POST" action="account_test.php">
-		<!-- "action" specifies the file or page that will receive the form data for processing. As with this example, it can be this same file. -->
-		<p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
-	</form></div>
+<div class="main">
+<h1>Users</h1>
+
+<!-- commented out due to redundancy, left code in case want to put it back -->
+
+<!--
+<h3>Reset</h3>
+<div>
+<p>Reset the table. If this is the <b>first time</b> you're running the website, you <b>must</b> reset.</p>
+<form method="POST" action="account_test.php">
+<p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
+</form></div>
+-->
+
 	<?php
 	function handleResetRequest()
 	{
@@ -359,9 +365,10 @@ function run_sql_file($location)
 	    printResult($result);
 	}
     ?>
-    <div class="bubble"><h2>Select User</h2>
+    <h3>Select User</h3>
+    <div>
     <form method="GET" action="account_test.php">
-        Username: <input type="text" name="insName"> <br /><br />
+        Username:   <input type="text" name="insName"> <br /><br />
         <input type="submit" name="getAction" value="<?= $getLookUp ?>"></p>
     </form></div>
 
