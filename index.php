@@ -93,6 +93,7 @@ require("pages/library.php");
 	<?php
 	include("pages/dml.php");
 	include("pages/query.php");
+	include("pages/signup.inc.php");
 
 	if (isset($_POST['postAction'])) {
 		handlePOSTRequest();
