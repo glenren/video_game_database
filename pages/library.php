@@ -36,6 +36,8 @@ $postDelete = 'delete';
 function onPageLoad()
 {
     connectToDB();
+    global $pklist;
+    global $columnslist;
     $pklist = fetch_table("
         SELECT UNIQUE cols.table_name, cols.column_name
         FROM USER_TAB_COLUMNS tab_col, user_constraints cons, user_cons_columns cols
@@ -43,7 +45,8 @@ function onPageLoad()
         AND cons.constraint_type = 'P'
         AND cons.constraint_name = cols.constraint_name
         AND cons.owner = cols.owner ");
-    $columnslist = fetch_table(" SELECT tab_col.table_name, tab_col.column_name
+    $columnslist = fetch_table("
+        SELECT tab_col.table_name, tab_col.column_name
         FROM USER_TAB_COLUMNS tab_col ");
     disconnectFromDB();
 }
@@ -246,7 +249,8 @@ function handleGETRequest()
     }
 }
 
-function printResult($result) { //prints results from a select statement
+function printResult($result)
+{ //prints results from a select statement
     echo "<table>";
     $headerPrinted = false;
     while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
@@ -258,26 +262,26 @@ function printResult($result) { //prints results from a select statement
                 $header = $header . "<th>" . $key . "</th>";
             }
 
-			debug_to_console($tuple);
-			if ($key == "WEBSITE" && $value && $value != "null") {
-			    $tuple = $tuple . "<td><a href =" . $value . " target='_blank'>Visit site</a></td>";
+            debug_to_console($tuple);
+            if ($key == "WEBSITE" && $value && $value != "null") {
+                $tuple = $tuple . "<td><a href =" . $value . " target='_blank'>Visit site</a></td>";
             } else {
                 $tuple = $tuple . "<td>" . $value . "</td>";
             }
-		}
+        }
 
-		$tuple = $tuple . "</tr>";
+        $tuple = $tuple . "</tr>";
 
-		if (!$headerPrinted) {
-			$header = $header . "</tr>";
-			echo $header;
-			$headerPrinted = true;
-		}
+        if (!$headerPrinted) {
+            $header = $header . "</tr>";
+            echo $header;
+            $headerPrinted = true;
+        }
 
-		echo $tuple;
-	}
+        echo $tuple;
+    }
 
-	echo "</table>";
+    echo "</table>";
 }
 
 function sql_file_to_array($location)
