@@ -38,6 +38,7 @@ $getCount = 'count';
 $getDisplay = 'display';
 $getSPJ = 'SPJ';
 $getQuery = 'query';
+$postDelete = 'delete';
 ?>
 
 
@@ -180,6 +181,7 @@ function handlePOSTRequest()
     global $postReset;
     global $postUpdate;
     global $postInsert;
+	global $postDelete;
     if (connectToDB()) {
         switch ($_POST['postAction']) {
             case $postReset:
@@ -191,6 +193,9 @@ function handlePOSTRequest()
             case $postInsert:
                 handleInsertRequest();
                 break;
+			case $postDelete:
+				handleDeleteRequest();
+				break;
         }
         disconnectFromDB();
     }

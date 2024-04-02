@@ -46,13 +46,9 @@ function handleDeleteRequest()
 {
     global $db_conn;
     //getting value from user and delete data from table
-    $tuple = array(
-        ":bind1" => $_POST['gameTitle']
-    );
-    $alltuples = array(
-        $tuple
-    );
-    executeBoundSQL("DELETE FROM VideoGameMadeBy VALUES (:bind1", $alltuples);
+	$name = $_POST['gameTitle'];
+
+	executePlainSQL("DELETE FROM VideoGameMadeBy WHERE Name='" . $name . "'");
 
     if (oci_commit($db_conn)) {
         popUp("Successfully deleted value from table!");
@@ -65,7 +61,7 @@ function handleDeleteRequest()
 <h2> Delete Video Game</h2>
 <form method="POST" action="index.php">
     Video Game Title: <input type="text" name="gameTitle"><br /><br />
-    <input type="submit" name="postAction" value="<?= $getCount ?>"></p>
+    <input type="submit" name="postAction" value="<?= $postDelete ?>"></p>
 </form>
 
 <?php

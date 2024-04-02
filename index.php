@@ -51,7 +51,7 @@ require("pages/library.php");
     <h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
     <!-- navigation bar to go to different pages -->
     <ul>
-        <li><a href="#home">Home</a></li>
+        <li><a href="index.php">Home</a></li>
         <li><a href="#news">Video Games</a></li>
         <li><a href="account_test.php">Users</a></li>
         <li><a href="#about">Dev Teams</a></li>
@@ -93,7 +93,6 @@ require("pages/library.php");
 	<?php
 	include("pages/dml.php");
 	include("pages/query.php");
-	include("pages/signup.inc.php");
 
 	if (isset($_POST['postAction'])) {
 		handlePOSTRequest();
