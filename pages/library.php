@@ -6,29 +6,17 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Database access configuration
-$creds = fopen("credentials.txt", "r") or die("Unable to open file!");
-$config["dbuser"] = trim(fgets($creds));
-$config["dbpassword"] = trim(fgets($creds));
-$config["dbserver"] = "dbhost.students.cs.ubc.ca:1522/stu";
-fclose($creds);
+$config = array();
+if (file_exists("credentials.txt")) {
+    $creds = fopen("credentials.txt", "r");
+    $config = login($creds);
+    fclose($creds);
+    onPageLoad();
+}
+
 $db_conn = NULL;	// login credentials are used in connectToDB()
 $success = true;	// keep track of errors so page redirects only if there are no errors
 $show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
-
-connectToDB();
-$pklist = fetch_table("
-SELECT UNIQUE cols.table_name, cols.column_name
-FROM USER_TAB_COLUMNS tab_col, user_constraints cons, user_cons_columns cols
-WHERE cols.table_name = tab_col.table_name
-AND cons.constraint_type = 'P'
-AND cons.constraint_name = cols.constraint_name
-AND cons.owner = cols.owner
-");
-$columnslist = fetch_table("
-SELECT tab_col.table_name, tab_col.column_name
-FROM USER_TAB_COLUMNS tab_col
-");
-disconnectFromDB();
 
 // Command strings for ORACLE
 $postReset = "reset";
@@ -36,6 +24,7 @@ $postInsert = 'insert';
 $postUpdate = 'update';
 $getCount = 'count';
 $getDisplay = 'display';
+$getLookUp = 'Search';
 $getSPJ = 'SPJ';
 $getQuery = 'query';
 $postDelete = 'delete';
@@ -44,6 +33,30 @@ $postDelete = 'delete';
 
 
 <?php
+function onPageLoad()
+{
+    connectToDB();
+    $pklist = fetch_table("
+        SELECT UNIQUE cols.table_name, cols.column_name
+        FROM USER_TAB_COLUMNS tab_col, user_constraints cons, user_cons_columns cols
+        WHERE cols.table_name = tab_col.table_name
+        AND cons.constraint_type = 'P'
+        AND cons.constraint_name = cols.constraint_name
+        AND cons.owner = cols.owner ");
+    $columnslist = fetch_table(" SELECT tab_col.table_name, tab_col.column_name
+        FROM USER_TAB_COLUMNS tab_col ");
+    disconnectFromDB();
+}
+
+function login($creds)
+{
+    global $config;
+    $config["dbuser"] = trim(fgets($creds));
+    $config["dbpassword"] = trim(fgets($creds));
+    $config["dbserver"] = "dbhost.students.cs.ubc.ca:1522/stu";
+    return $config;
+}
+
 function fetch_table($query)
 {
     global $db_conn;
@@ -181,7 +194,7 @@ function handlePOSTRequest()
     global $postReset;
     global $postUpdate;
     global $postInsert;
-	global $postDelete;
+    global $postDelete;
     if (connectToDB()) {
         switch ($_POST['postAction']) {
             case $postReset:
@@ -193,9 +206,9 @@ function handlePOSTRequest()
             case $postInsert:
                 handleInsertRequest();
                 break;
-			case $postDelete:
-				handleDeleteRequest();
-				break;
+            case $postDelete:
+                handleDeleteRequest();
+                break;
         }
         disconnectFromDB();
     }
@@ -210,6 +223,7 @@ function handleGETRequest()
     global $getDisplay;
     global $getQuery;
     global $getSPJ;
+    global $getLookUp;
     if (connectToDB()) {
         switch ($_GET['getAction']) {
             case $getCount:
@@ -224,9 +238,42 @@ function handleGETRequest()
             case $getQuery:
                 handleQueryRequest();
                 break;
+            case $getLookUp:
+                handleLookUpRequest();
+                break;
         }
         disconnectFromDB();
     }
+}
+
+function printResult($result) { //prints results from a select statement
+    echo "<table>";
+    $headerPrinted = false;
+    while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
+        $tuple = "<tr>";
+        $header = "<tr>";
+
+        foreach ($row as $key => $value) {
+            if (!$headerPrinted) {
+                $header = $header . "<th>" . $key . "</th>";
+            }
+
+			debug_to_console($tuple);
+			$tuple = $tuple . "<td>" . $value . "</td>";
+		}
+
+		$tuple = $tuple . "</tr>";
+
+		if (!$headerPrinted) {
+			$header = $header . "</tr>";
+			echo $header;
+			$headerPrinted = true;
+		}
+
+		echo $tuple;
+	}
+
+	echo "</table>";
 }
 
 function sql_file_to_array($location)
@@ -270,12 +317,12 @@ function run_sql_file($location)
 }
 
 $operators = array(
-	"=",
-	"<>",
-	">",
-	">=",
-	"<",
-	"<=",
+    "=",
+    "<>",
+    ">",
+    ">=",
+    "<",
+    "<=",
 );
 function areTokensOK()
 {
@@ -326,5 +373,3 @@ function areTokensOK()
     return true;
 }
 ?>
-
-

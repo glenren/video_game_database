@@ -170,10 +170,6 @@ function handleSPJRequest()
                     return;
                 }
                 divElements[0].remove();
-                // let lastchar = menu.getAttribute("name").splice(-1);
-                // if (!isNaN(lastchar)) {
-                //     inputWhereConCounter = Number(lastchar);
-                // }
             } else {
                 if (menu.parentElement.getElementsByTagName("div").length != 0) {
                     return;
@@ -221,7 +217,6 @@ function handleQueryRequest()
 <h3>General Query</h3>
 <div><form method="GET" action="index.php">
     FROM:
-    <!-- <input type="text" name="inputFrom"> -->
     <select name="inputFrom">
         <?php
         $temp = $pklist;
@@ -263,61 +258,6 @@ function handleDisplayRequest()
         }
     }
 }
-function printResult($result) { //prints results from a select statement
-    echo "<table>";
-    $headerPrinted = false;
-    while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
-        $tuple = "<tr>";
-        $header = "<tr>";
-
-        foreach ($row as $key => $value) {
-            if (!$headerPrinted) {
-                $header = $header . "<th>" . $key . "</th>";
-            }
-
-			debug_to_console($tuple);
-			$tuple = $tuple . "<td>" . $value . "</td>";
-		}
-
-		$tuple = $tuple . "</tr>";
-
-		if (!$headerPrinted) {
-			$header = $header . "</tr>";
-			echo $header;
-			$headerPrinted = true;
-		}
-
-		echo $tuple;
-	}
-
-	echo "</table>";
-}
-
-/* old printResult code
-function printResult($result)
-{ //prints results from a select statement
-    echo "<table>";
-    $headerPrinted = false;
-    while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
-        $tuple = "<tr>";
-        $header = "<tr>";
-        foreach ($row as $key => $value) {
-            if (!$headerPrinted) {
-                $header = $header . "<th>" . $key . "</th>";
-            }
-            $tuple = $tuple . "<td>" . $value . "</td>";
-        }
-        $tuple = $tuple . "</tr>";
-        if (!$headerPrinted) {
-            $header = $header . "</tr>";
-            echo "<thead>" . $header . "</thead>" . "<tbody>";
-        }
-        $headerPrinted = true;
-        echo $tuple;
-    }
-    echo "</tbody>";
-    echo "</table>";
-} */
 ?>
 
 <h3>Display Tuples in DemoTable</h3>
