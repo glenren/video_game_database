@@ -97,6 +97,7 @@ require("pages/library.php");
 	{
 		// Drop old table and create new ones
 		run_sql_file("database.sql");
+		popUp("Reset successful!");
 	}
 	?>
 

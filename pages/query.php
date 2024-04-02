@@ -276,7 +276,12 @@ function printResult($result) { //prints results from a select statement
             }
 
 			debug_to_console($tuple);
-			$tuple = $tuple . "<td>" . $value . "</td>";
+
+			if ($key == "WEBSITE" && $value && $value != "null") {
+			    $tuple = $tuple . "<td><a href =" . $value . " target='_blank'>Visit site</a></td>";
+            } else {
+                $tuple = $tuple . "<td>" . $value . "</td>";
+            }
 		}
 
 		$tuple = $tuple . "</tr>";
