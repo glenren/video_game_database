@@ -44,7 +44,7 @@ require("pages/library.php");
 <div class="main">
 <h1>Video Game Database</h1>
 <h3>Reset</h3>
-<div>
+<div class="outer">
 <p>Reset the table. If this is the <b>first time</b> you're running the website, you <b>must</b> reset.</p>
 <form method="POST" action="index.php">
 <p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
