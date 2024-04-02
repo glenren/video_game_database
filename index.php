@@ -53,7 +53,7 @@ require("pages/library.php");
     <ul>
         <li><a href="index.php">Home</a></li>
         <li><a href="#news">Video Games</a></li>
-        <li><a href="account_test.php">Users</a></li>
+        <li><a href="pages/account_test.php">Users</a></li>
         <li><a href="#about">Dev Teams</a></li>
     </ul>
 </body>

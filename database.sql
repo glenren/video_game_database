@@ -99,7 +99,7 @@ CREATE TABLE PlayedOn (
 	PlatformName VARCHAR(128),
 	PRIMARY KEY (GID, PlatformName),
 	FOREIGN KEY (GID) REFERENCES VideoGameMadeBy ON DELETE CASCADE,
-	FOREIGN KEY (PlatformName) REFERENCES Platform
+	FOREIGN KEY (PlatformName) REFERENCES Platform ON DELETE CASCADE
 );
 CREATE TABLE ContainsDLC (
 	GID INT,
@@ -121,7 +121,7 @@ CREATE TABLE Adds (
 	GID INT,
 	Status VARCHAR(128),
 	PRIMARY KEY (Username, GID),
-	FOREIGN KEY (Username) REFERENCES Account,
+	FOREIGN KEY (Username) REFERENCES Account, 
 	FOREIGN KEY (GID) REFERENCES VideoGameMadeBy ON DELETE CASCADE
 );
 CREATE TABLE MakesReviewReviewing2 (
@@ -145,7 +145,7 @@ CREATE TABLE MakesReviewReviewing3 (
 	ReviewID INT,
 	Category VARCHAR(128),
 	PRIMARY KEY (ReviewID),
-	FOREIGN KEY (ReviewID) REFERENCES MakesReviewReviewing1
+	FOREIGN KEY (ReviewID) REFERENCES MakesReviewReviewing1 ON DELETE CASCADE
 );
 -- done adding all of the tables, now add in some tuples
 -- Dev
