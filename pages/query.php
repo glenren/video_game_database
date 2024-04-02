@@ -46,7 +46,7 @@ function handleSPJRequest()
 
     if (!empty($_GET["inputWhereCon"])) {
         $query .= " WHERE (";
-        $inputWhereConCounter = 1;
+        $inputWhereConCounter = "";
         function createCondition($inputWhereConCounter)
         {
             $condition = "";
@@ -64,9 +64,8 @@ function handleSPJRequest()
         while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
             $query .= createCondition($inputWhereConCounter);
             $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
-            $inputWhereConCounter++;
+            $inputWhereConCounter .= "_";
         }
-        $query .= createCondition("");
         $query .= ")";
     }
     $results = executePlainSQL($query);
@@ -116,7 +115,7 @@ function handleSPJRequest()
         }
     </script>
     <br />
-    SELECT Column:
+    SELECT:
     <select name="inputSelect">
         <option value="*">*</option>
         <?php
@@ -134,7 +133,7 @@ function handleSPJRequest()
         ?>
     </select>
     <br />
-    WHERE Column:
+    WHERE:
     <div>
         <select name="inputWhereVal1">
             <?php
@@ -166,17 +165,32 @@ function handleSPJRequest()
             <option value="AND">AND</option>
             <option value="OR">OR</option>
         </select>
-        <script>
-            var inputWhereConCounter = 1;
-            function changeWhere(menu) {
+    </div>
+    <script>
+        var inputWhereConCounter = "_";
+        function changeWhere(menu) {
+            if (menu.value == "") {
+                let divElements = menu.parentElement.getElementsByTagName("div");
+                if (divElements.length == 0) {
+                    return;
+                }
+                divElements[0].remove();
+                // let lastchar = menu.getAttribute("name").splice(-1);
+                // if (!isNaN(lastchar)) {
+                //     inputWhereConCounter = Number(lastchar);
+                // }
+            } else {
+                if (menu.parentElement.getElementsByTagName("div").length != 0) {
+                    return;
+                }
                 menu2 = menu.parentElement.cloneNode(true);
-                for (const child of menu.parentElement.children) {
+                for (const child of menu2.children) {
                     child.setAttribute("name", child.getAttribute("name") + inputWhereConCounter);
                 }
                 menu.parentElement.appendChild(menu2);
             }
-        </script>
-    </div>
+        }
+    </script>
     <br />
     <input type="submit" name="getAction" value="<?= $getSPJ ?>"></p>
 </form>
