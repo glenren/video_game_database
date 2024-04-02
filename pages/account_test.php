@@ -35,7 +35,7 @@ $success = true;	// keep track of errors so page redirects only if there are no 
 $show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
 
 // Command strings for ORACLE
-$postReset = "reset";
+$postReset = "Reset";
 $postInsert = 'insert';
 $getLookUp = 'Search';
 $postUpdate = 'update';
