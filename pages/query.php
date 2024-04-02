@@ -32,17 +32,42 @@ function handleSPJRequest()
     if (!areTokensOK()) {
         return;
     }
-    $query = "SELECT " . $_GET['inputSelect'] .
-        " FROM " . $_GET['inputFrom'];
-    if (!empty($_GET['inputWhereVal2'])) {
-        $val2 = $_GET['inputWhereVal2'];
-        if (!ctype_digit($_GET['inputWhereOp'])) {
-            $val2 = "'" . $val2 ."'";
+    $query = "SELECT " . $_GET['inputSelect'];
+    $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
+    global $pklist;
+    $sharedColumns = array_intersect($pklist[$selectedTables[0]], $pklist[$selectedTables[1]]);
+    $query .= " FROM " . $selectedTables[0] . " INNER JOIN " .
+        $selectedTables[1] . " ON (";
+    foreach ($sharedColumns as $key => $column) {
+        $query .= $selectedTables[0] . "." . $column .
+            "=" . $selectedTables[1] . "." . $column;
+    }
+    $query .= ")";
+
+    if (!empty($_GET["inputWhereCon"])) {
+        $query .= " WHERE (";
+        $inputWhereConCounter = 1;
+        function createCondition($inputWhereConCounter)
+        {
+            $condition = "";
+            if (!empty($_GET['inputWhereVal2' . $inputWhereConCounter])) {
+                $val2 = $_GET['inputWhereVal2' . $inputWhereConCounter];
+                if (!ctype_digit($_GET['inputWhereOp' . $inputWhereConCounter])) {
+                    $val2 = "'" . $val2 . "'";
+                }
+                $condition = $_GET['inputWhereVal1' . $inputWhereConCounter] .
+                    $_GET['inputWhereOp' . $inputWhereConCounter] .
+                    $val2;
+            }
+            return $condition;
         }
-        $query .= " WHERE (" . $_GET['inputWhereVal1'] .
-            $_GET['inputWhereOp'] .
-            $val2 .
-            ")";
+        while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
+            $query .= createCondition($inputWhereConCounter);
+            $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
+            $inputWhereConCounter++;
+        }
+        $query .= createCondition("");
+        $query .= ")";
     }
     $results = executePlainSQL($query);
 
@@ -110,31 +135,48 @@ function handleSPJRequest()
     </select>
     <br />
     WHERE Column:
-    <select name="inputWhereVal1">
-        <?php
-        foreach ($columnslist as $table => $columns) {
-            foreach ($columns as $column) {
-                $class1 = "selectOption" . $table;
-                $class2 = "selectOption";
-                echo "<option " .
-                    "style=\"display:none\" " .
-                    "class=\"" . $class1 . " " . $class2 . "\" " .
-                    "value=\"" . $table . "." . $column . "\"" .
-                    ">" . $table . "." . $column . "</option>";
+    <div>
+        <select name="inputWhereVal1">
+            <?php
+            foreach ($columnslist as $table => $columns) {
+                foreach ($columns as $column) {
+                    $class1 = "selectOption" . $table;
+                    $class2 = "selectOption";
+                    echo "<option " .
+                        "style=\"display:none\" " .
+                        "class=\"" . $class1 . " " . $class2 . "\" " .
+                        "value=\"" . $table . "." . $column . "\"" .
+                        ">" . $table . "." . $column . "</option>";
+                }
             }
-        }
-        ?>
-    </select>
-    <select name="inputWhereOp">
-        <?php
-        foreach ($operators as $operator) {
-            echo "<option " .
-                "value=\"" . $operator . "\"" .
-                ">" . $operator . "</option>";
-        }
-        ?>
-    </select>
-    <input name="inputWhereVal2">
+            ?>
+        </select>
+        <select name="inputWhereOp">
+            <?php
+            foreach ($operators as $operator) {
+                echo "<option " .
+                    "value=\"" . $operator . "\"" .
+                    ">" . $operator . "</option>";
+            }
+            ?>
+        </select>
+        <input name="inputWhereVal2">
+        <select name="inputWhereCon" onChange="changeWhere(this)">
+            <option value=""></option>
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+        </select>
+        <script>
+            var inputWhereConCounter = 1;
+            function changeWhere(menu) {
+                menu2 = menu.parentElement.cloneNode(true);
+                for (const child of menu.parentElement.children) {
+                    child.setAttribute("name", child.getAttribute("name") + inputWhereConCounter);
+                }
+                menu.parentElement.appendChild(menu2);
+            }
+        </script>
+    </div>
     <br />
     <input type="submit" name="getAction" value="<?= $getSPJ ?>"></p>
 </form>

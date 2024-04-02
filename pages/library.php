@@ -290,12 +290,14 @@ function areTokensOK()
 
     $_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
     $inSelectedTables = false;
-    foreach ($tablesFrom as $table) {
-        $column = preg_split("/\./", $_GET['inputSelect'])[1];
-        var_dump($column);
-        if (in_array($column, $columnslist[$table])) {
-            $inSelectedTables = true;
-            break;
+    if ($_GET['inputSelect'] != "*") {
+        foreach ($tablesFrom as $table) {
+            $column = preg_split("/\./", $_GET['inputSelect'])[1];
+            var_dump($column);
+            if (in_array($column, $columnslist[$table])) {
+                $inSelectedTables = true;
+                break;
+            }
         }
     }
     if (
