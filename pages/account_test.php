@@ -229,7 +229,7 @@ function run_sql_file($location)
 <html>
 
 <head>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="../style.css">
 	<title>CPSC 304 PHP/Oracle Demonstration</title>
 </head>
 <h1>Video Game Database</h1>
@@ -248,7 +248,7 @@ function run_sql_file($location)
 	function handleResetRequest()
 	{
 		// Drop old table and create new ones
-		run_sql_file("database.sql");
+		run_sql_file("../database.sql");
 	}
 	function handleInsertRequest()
 	{
@@ -301,7 +301,7 @@ function run_sql_file($location)
 	function handleDisplayRequest()
 	{
 		global $db_conn;
-		$commands = sql_file_to_array("select.sql");
+		$commands = sql_file_to_array("../select.sql");
 		foreach ($commands as $command) {
 			if (trim($command)) {
 				debug_to_console($command);
