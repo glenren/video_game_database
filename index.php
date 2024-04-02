@@ -88,7 +88,7 @@ require("pages/library.php");
 <h3>Reset</h3>
 <div>
 <p>Reset the table. If this is the <b>first time</b> you're running the website, you <b>must</b> reset.</p>
-<form method="POST" action="account_test.php">
+<form method="POST" action="index.php">
 <p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
 </form></div>
 
