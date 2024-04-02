@@ -89,7 +89,7 @@ tr:nth-of-type(even) {
         border-radius: 10px 10px 0px 0px;
     }
 
-    div {
+    div.outer {
         font-size: 16px;
         border-radius: 0px 0px 10px 10px;
         border: 0px solid white;

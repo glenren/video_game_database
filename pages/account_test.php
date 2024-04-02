@@ -60,7 +60,7 @@ login($creds);
 		}
 		?>
 		<h3>Select User</h3>
-		<div>
+		<div class="outer">
 			<form method="GET" action="account_test.php">
 				Username: <input type="text" name="insName"> <br /><br />
 				<input type="submit" name="getAction" value="<?= $getLookUp ?>"></p>

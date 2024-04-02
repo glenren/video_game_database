@@ -17,7 +17,7 @@ function handleCountRequest()
 }
 ?>
 <h3>Number of Games in Database</h3>
-<div><form method="GET" action="index.php">
+<div class="outer"><form method="GET" action="index.php">
     <input type="submit" name="getAction" value="<?= $getCount ?>"></p>
 </form></div>
 
@@ -71,7 +71,7 @@ function handleSPJRequest()
 
     global $success;
     if ($success) {
-        popUp("Success");
+        // popUp("Success");
         printResult($results);
     } else {
         popUp("Database Error");
@@ -80,7 +80,7 @@ function handleSPJRequest()
 ?>
 
 <h3>SELECT PROJECT JOIN Query</h3>
-<div><form method="GET" action="index.php">
+<div class="outer"><form method="GET" action="index.php">
     FROM:
     <select name="inputFrom" onChange="switchSelect(this);">
         <?php
@@ -131,7 +131,7 @@ function handleSPJRequest()
         ?>
     </select><br/><br/>
     WHERE:
-        <select name="inputWhereVal1">
+        <span><select name="inputWhereVal1">
             <?php
             foreach ($columnslist as $table => $columns) {
                 foreach ($columns as $column) {
@@ -160,12 +160,12 @@ function handleSPJRequest()
             <option value=""></option>
             <option value="AND">AND</option>
             <option value="OR">OR</option>
-        </select><br/><br/>
+        </select><br/><br/></span>
     <script>
         var inputWhereConCounter = "_";
         function changeWhere(menu) {
             if (menu.value == "") {
-                let divElements = menu.parentElement.getElementsByTagName("div");
+                let divElements = menu.parentElement.getElementsByTagName("span");
                 if (divElements.length == 0) {
                     return;
                 }
@@ -207,7 +207,7 @@ function handleQueryRequest()
 
     global $success;
     if ($success) {
-        popUp("Success");
+        //popUp("Success");
         printResult($results);
     } else {
         popUp("Database Error");
@@ -215,7 +215,7 @@ function handleQueryRequest()
 }
 ?>
 <h3>General Query</h3>
-<div><form method="GET" action="index.php">
+<div class="outer"><form method="GET" action="index.php">
     FROM:
     <select name="inputFrom">
         <?php
@@ -261,6 +261,6 @@ function handleDisplayRequest()
 ?>
 
 <h3>Display Tuples in DemoTable</h3>
-<div><form method="GET" action="index.php">
+<div class="outer"><form method="GET" action="index.php">
     <input type="submit" name="getAction" value="display"></p>
 </form></div>
