@@ -61,7 +61,6 @@ function handleDeleteRequest()
 }
 ?>
 <h3> Delete Video Game</h3>
-<div><form method="POST" action="index.php">
 <div class="outer"><form method="POST" action="index.php">
     Video Game Title: <input type="text" name="gameTitle"><br /><br />
     <input type="submit" name="postAction" value="<?= $postDelete ?>"></p>
@@ -89,7 +88,6 @@ function handleUpdateRequest()
 ?>
 
 <h3>Update Name in DemoTable</h3>
-<div><p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 <div class="outer"><p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 <br/>
 <form method="POST" action="index.php">
