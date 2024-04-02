@@ -1,4 +1,3 @@
-<hr />
 <?php
 function handleCountRequest()
 {
@@ -17,10 +16,10 @@ function handleCountRequest()
     }
 }
 ?>
-<h2>Number of Video Games in Database</h2>
-<form method="GET" action="index.php">
+<h3>Number of Games in Database</h3>
+<div><form method="GET" action="index.php">
     <input type="submit" name="getAction" value="<?= $getCount ?>"></p>
-</form>
+</form></div>
 
 
 
@@ -79,9 +78,9 @@ function handleSPJRequest()
     }
 }
 ?>
-<hr />
-<h2>SELECT PROJECT JOIN Query</h2>
-<form method="GET" action="index.php">
+
+<h3>SELECT PROJECT JOIN Query</h3>
+<div><form method="GET" action="index.php">
     FROM:
     <select name="inputFrom" onChange="switchSelect(this);">
         <?php
@@ -97,7 +96,7 @@ function handleSPJRequest()
             }
         }
         ?>
-    </select>
+    </select><br/><br/>
     <script>
         function switchSelect(htmlFrom) {
             elements = document.getElementsByClassName("selectOption");
@@ -114,7 +113,6 @@ function handleSPJRequest()
             });
         }
     </script>
-    <br />
     SELECT:
     <select name="inputSelect">
         <option value="*">*</option>
@@ -131,10 +129,8 @@ function handleSPJRequest()
             }
         }
         ?>
-    </select>
-    <br />
+    </select><br/><br/>
     WHERE:
-    <div>
         <select name="inputWhereVal1">
             <?php
             foreach ($columnslist as $table => $columns) {
@@ -164,8 +160,7 @@ function handleSPJRequest()
             <option value=""></option>
             <option value="AND">AND</option>
             <option value="OR">OR</option>
-        </select>
-    </div>
+        </select><br/><br/>
     <script>
         var inputWhereConCounter = "_";
         function changeWhere(menu) {
@@ -191,11 +186,8 @@ function handleSPJRequest()
             }
         }
     </script>
-    <br />
     <input type="submit" name="getAction" value="<?= $getSPJ ?>"></p>
-</form>
-
-
+</form></div>
 
 <?php
 function handleQueryRequest()
@@ -226,9 +218,8 @@ function handleQueryRequest()
     }
 }
 ?>
-<hr />
-<h2>General Query</h2>
-<form method="GET" action="index.php">
+<h3>General Query</h3>
+<div><form method="GET" action="index.php">
     FROM:
     <!-- <input type="text" name="inputFrom"> -->
     <select name="inputFrom">
@@ -245,18 +236,17 @@ function handleQueryRequest()
             }
         }
         ?>
-    </select>
-    <br />
+    </select><br/><br/>
     SELECT Column: <input type="text" name="inputSelect">
-    <br />
+    <br/><br/>
     WHERE Column: <input type="text" name="inputWhere">
-    <br />
+    <br/><br/>
     GROUP BY: <input type="text" name="inputGroupBy">
-    <br />
+    <br/><br/>
     HAVING: <input type="text" name="inputHaving">
-    <br />
+    <br/><br/>
     <input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
-</form>
+</form></div>
 
 
 
@@ -273,6 +263,37 @@ function handleDisplayRequest()
         }
     }
 }
+function printResult($result) { //prints results from a select statement
+    echo "<table>";
+    $headerPrinted = false;
+    while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
+        $tuple = "<tr>";
+        $header = "<tr>";
+
+        foreach ($row as $key => $value) {
+            if (!$headerPrinted) {
+                $header = $header . "<th>" . $key . "</th>";
+            }
+
+			debug_to_console($tuple);
+			$tuple = $tuple . "<td>" . $value . "</td>";
+		}
+
+		$tuple = $tuple . "</tr>";
+
+		if (!$headerPrinted) {
+			$header = $header . "</tr>";
+			echo $header;
+			$headerPrinted = true;
+		}
+
+		echo $tuple;
+	}
+
+	echo "</table>";
+}
+
+/* old printResult code
 function printResult($result)
 { //prints results from a select statement
     echo "<table>";
@@ -296,10 +317,10 @@ function printResult($result)
     }
     echo "</tbody>";
     echo "</table>";
-}
+} */
 ?>
-<hr />
-<h2>Display Tuples in DemoTable</h2>
-<form method="GET" action="index.php">
+
+<h3>Display Tuples in DemoTable</h3>
+<div><form method="GET" action="index.php">
     <input type="submit" name="getAction" value="display"></p>
-</form>
+</form></div>

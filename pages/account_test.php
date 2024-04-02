@@ -229,8 +229,7 @@ function run_sql_file($location)
 <html>
 
 <head>
-	<link rel="stylesheet" href="../style.css">
-	<title>CPSC 304 PHP/Oracle Demonstration</title>
+<link rel="stylesheet" href="../style.css">
 </head>
 <body>
 <div class="nav">

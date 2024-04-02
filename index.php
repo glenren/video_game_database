@@ -18,11 +18,12 @@
 require("pages/library.php");
 ?>
 
-<html>
+<!-- <html>
 
 <head>
+<link rel="stylesheet" href="../style.css">
     <!-- setting the style for the nav bar. borrowed from https://www.w3schools.com/css/css_navbar_vertical.asp -->
-    <style>
+    <!-- <style>
         ul {
             list-style-type: none;
             margin: 0;
@@ -46,43 +47,52 @@ require("pages/library.php");
     </style>
 </head>
 
-<body>
-    <h1>Video Game Database</h1>
-    <h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
-    <!-- navigation bar to go to different pages -->
-    <ul>
-        <li><a href="index.php">Home</a></li>
-        <li><a href="#news">Video Games</a></li>
-        <li><a href="pages/account_test.php">Users</a></li>
-        <li><a href="#about">Dev Teams</a></li>
-    </ul>
+<body> -->
+<!-- <h2> CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2> -->
+
+<!-- navigation bar to go to different pages -->
+<!-- <ul>
+<li><a href="index.php">Home</a></li>
+<li><a href="#news">Video Games</a></li>
+<li><a href="pages/account_test.php">Users</a></li>
+<li><a href="#about">Dev Teams</a></li>
+</ul>
 </body>
-<html>
+<html> -->
 
 <html>
-
 <head>
 	<script>
 		var pklist = <?php echo json_encode($pklist) ?>;
 		var columnslist = <?php echo json_encode($columnslist) ?>;
 	</script>
 	<link rel="stylesheet" href="style.css">
-	<title>CPSC 304 PHP/Oracle Demonstration</title>
 </head>
 
 
 
 <body>
+<div class="nav">
+<ul>
+<li class="spacer">|</li>
+<li class="text">VIDEO GAME DATABASE</li>
+<li><a class="active" href="index.php">Home</a></li>
+<li><a href="#news">Games</a></li>
+<li><a href="pages/account_test.php">Users</a></li>
+<li><a href="#about">Dev Teams</a></li>
+</ul>
+</div>
 
-	<hr />
-	<h2>Reset</h2>
-	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you
-		MUST use reset</p>
-	<form method="POST" action="index.php">
-		<!-- "action" specifies the file or page that will receive the form data for processing. As with this example, it can be this same file. -->
-		<p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
-	</form>
-	<?php
+<div class="main">
+<h1>Video Game Database</h1>
+<h3>Reset</h3>
+<div>
+<p>Reset the table. If this is the <b>first time</b> you're running the website, you <b>must</b> reset.</p>
+<form method="POST" action="account_test.php">
+<p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
+</form></div>
+
+<?php
 	function handleResetRequest()
 	{
 		// Drop old table and create new ones
@@ -101,7 +111,7 @@ require("pages/library.php");
 	) {
 		handleGETRequest();
 	}
-	?>
+?>
 </body>
 
 </html>

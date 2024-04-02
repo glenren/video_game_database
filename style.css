@@ -111,7 +111,7 @@ tr:nth-of-type(even) {
         padding-top: 10px;
     }
 
-    input[type=text] {
+    input[type=text], select {
         margin-left: 5px;
     }
 
@@ -177,8 +177,9 @@ tr:nth-of-type(even) {
 }
 
 .nav li.spacer {
-    padding-top: 0.7%;
-    padding-bottom: 1.5%;
+    padding-top: 0.9%;
+    padding-bottom: 0.6%;
+    font-size: 24px;
     float: left;
     width: 7%;
     background-color: #2fbac4;

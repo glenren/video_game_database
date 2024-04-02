@@ -27,9 +27,8 @@ function handleInsertRequest()
     }
 }
 ?>
-<hr />
-<h2>Add A Video Game</h2>
-<form method="POST" action="index.php">
+<h3>Add Video Game</h3>
+<div><form method="POST" action="index.php">
     GID: <input type="text" name="GID"> <br /><br />
     Video Game Title: <input type="text" name="gameTitle"> <br /><br />
     Release Date: <input type="text" name="releaseDate"> <br /><br />
@@ -37,7 +36,7 @@ function handleInsertRequest()
     Category: <input type="text" name="category"> <br /><br />
     Development Team: <input type="text" name="devteamName"> <br /><br />
     <input type="submit" name="postAction" value="<?= $postInsert ?>"></p>
-</form>
+</form></div>
 
 
 
@@ -57,12 +56,11 @@ function handleDeleteRequest()
     }
 }
 ?>
-<hr />
-<h2> Delete Video Game</h2>
-<form method="POST" action="index.php">
+<h3> Delete Video Game</h3>
+<div><form method="POST" action="index.php">
     Video Game Title: <input type="text" name="gameTitle"><br /><br />
     <input type="submit" name="postAction" value="<?= $postDelete ?>"></p>
-</form>
+</form></div>
 
 <?php
 function handleUpdateRequest()
@@ -84,11 +82,12 @@ function handleUpdateRequest()
     }
 }
 ?>
-<hr />
-<h2>Update Name in DemoTable</h2>
-<p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
+
+<h3>Update Name in DemoTable</h3>
+<div><p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
+<br/>
 <form method="POST" action="index.php">
-    Old Name: <input type="text" name="oldName"> <br /><br />
+    Old Name: <input type="text" name="oldName"> <br/><br/>
     New Name: <input type="text" name="newName"> <br /><br />
     <input type="submit" name="postAction" value="<?= $postUpdate ?>"></p>
-</form>
+</form></div>
