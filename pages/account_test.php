@@ -25,7 +25,7 @@ error_reporting(E_ALL);
 // Set some parameters
 
 // Database access configuration
-$creds = fopen("credentials.txt", "r") or die("Unable to open file!");
+$creds = fopen("../credentials.txt", "r") or die("Unable to open file!");
 $config["dbuser"] = trim(fgets($creds));
 $config["dbpassword"] = trim(fgets($creds));
 $config["dbserver"] = "dbhost.students.cs.ubc.ca:1522/stu";
