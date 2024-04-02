@@ -4,7 +4,7 @@ function handleInsertRequest()
     global $db_conn;
     //Getting the values from user and insert data into the table
     $tuple = array(
-        ":bind1" => $_POST['GID'],
+        ":bind1" => rand(),
         ":bind2" => $_POST['gameTitle'],
         ":bind3" => $_POST['releaseDate'], //has to be in form dd-MMMM-yyyy
         ":bind4" => $_POST['price'],
@@ -29,7 +29,6 @@ function handleInsertRequest()
 ?>
 <h3>Add Video Game</h3>
 <div><form method="POST" action="index.php">
-    GID: <input type="text" name="GID"> <br /><br />
     Video Game Title: <input type="text" name="gameTitle"> <br /><br />
     Release Date: <input type="text" name="releaseDate"> <br /><br />
     Price: <input type="text" name="price"> <br /><br />
