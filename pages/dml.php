@@ -28,12 +28,8 @@ function handleInsertRequest()
 }
 ?>
 <h3>Add Video Game</h3>
-<<<<<<< HEAD
-<div><form method="POST" action="index.php">
-=======
+<form method="POST" action="index.php">
 <div class="outer"><form method="POST" action="index.php">
-    GID: <input type="text" name="GID"> <br /><br />
->>>>>>> 087105526332648ac8b2229d02bf1328c74e4e40
     Video Game Title: <input type="text" name="gameTitle"> <br /><br />
     Release Date: <input type="text" name="releaseDate"> <br /><br />
     Price: <input type="text" name="price"> <br /><br />
