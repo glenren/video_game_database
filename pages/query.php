@@ -165,7 +165,7 @@ function handleSPJRequest()
         var inputWhereConCounter = "_";
         function changeWhere(menu) {
             if (menu.value == "") {
-                let divElements = menu.parentElement.getElementsByTagName("div");
+                let divElements = menu.parentElement.getElementsByTagName("span");
                 if (divElements.length == 0) {
                     return;
                 }
