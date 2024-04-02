@@ -232,18 +232,24 @@ function run_sql_file($location)
 	<link rel="stylesheet" href="../style.css">
 	<title>CPSC 304 PHP/Oracle Demonstration</title>
 </head>
-<h1>Video Game Database</h1>
-<h2>CPSC 304 2023w2 project by Kat Duangkham, Glen Ren and Chanaldy Soenarjo</h2>
-
 <body>
-	<hr />
-	<h2>Reset</h2>
+<div class="nav">
+<ul>
+<li class="spacer">|</li>
+<li class="text">VIDEO GAME DATABASE</li>
+<li><a href="../index.php">Home</a></li>
+<li><a href="#news">Games</a></li>
+<li><a class="active" href="account_test.php">Users</a></li>
+<li><a href="#about">Dev Teams</a></li>
+</ul></div>
+<div class="main"><h1>Users</h1>
+	<div class="bubble"><h2>Reset</h2>
 	<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you
 		MUST use reset</p>
 	<form method="POST" action="account_test.php">
 		<!-- "action" specifies the file or page that will receive the form data for processing. As with this example, it can be this same file. -->
 		<p><input type="submit" name="postAction" value="<?= $postReset ?>"></p>
-	</form>
+	</form></div>
 	<?php
 	function handleResetRequest()
 	{
@@ -328,16 +334,20 @@ function run_sql_file($location)
 			$tuple = $tuple . "</tr>";
 			if (!$headerPrinted) {
 				$header = $header . "</tr>";
-				echo "<thead>" . $header . "</thead>" . "<tbody>";
+				echo $header;
+				$headerPrinted = true;
 			}
-			$headerPrinted = true;
 			echo $tuple;
 		}
-		echo "</tbody>";
 		echo "</table>";
 	}
 	function handleLookUpRequest() {
 	    global $db_conn;
+
+	    if (!$_GET['insName']) {
+	        popUp("Please enter a username!");
+	        return;
+	    }
 
 	    $command = "SELECT g.Name, g.DevTeamName, g.Category, a.Status FROM VideoGameMadeBy g, Adds a "
 	    . "WHERE a.Username = '" . $_GET['insName'] . "' AND a.GID = g.GID";
@@ -345,17 +355,15 @@ function run_sql_file($location)
 	    debug_to_console($command);
 	    $result = executePlainSQL($command);
 	    oci_commit($db_conn);
-	    echo "<hr/><h2>" . $_GET['insName'] . "'s Added Games:</h2>";
+	    echo "<h2>Games added by user <i><u>" . $_GET['insName'] . "</u></i>:</h2>";
 	    printResult($result);
 	}
     ?>
-	
-    <hr />
-    <h2>Select User</h2>
+    <div class="bubble"><h2>Select User</h2>
     <form method="GET" action="account_test.php">
         Username: <input type="text" name="insName"> <br /><br />
         <input type="submit" name="getAction" value="<?= $getLookUp ?>"></p>
-    </form>
+    </form></div>
 
     <?php
 	if (isset($_POST['postAction'])) {
@@ -366,6 +374,6 @@ function run_sql_file($location)
 		handleGETRequest();
 	}
 	?>
-</body>
+</div></body>
 
 </html>
