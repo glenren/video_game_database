@@ -67,16 +67,17 @@ function handleUpdateRequest()
 {
     global $db_conn;
     $username = $_POST['username'];
-	$displayname = $_POST['displayname'] ?? 'null';
+	$displayname = $_POST['displayname'] ?? 'default';
+	$email = $_POST['email'] ?? 'email';
 	
-	executePlainSQL("UPDATE Account SET displayname='" . $displayname . "' WHERE username='" . $username . "'");
+	executePlainSQL("UPDATE Account SET email='" . $email . "', displayname='" . $displayname . "' WHERE username='" . $username . "'");
 
     global $success;
     if (
         $success
         && oci_commit($db_conn)
     ) {
-        popUp("Successfully updated display name!");
+        popUp("Successfully updated account!");
     } else {
         popUp("Database Error");
     }
@@ -84,10 +85,12 @@ function handleUpdateRequest()
 ?>
 
 <h3>Update Account Information</h3>
-<div class="outer"><p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
+<div class="outer"><p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything. Include old value if not updating with 
+a new value</p>
 <br/>
 <form method="POST" action="index.php">
     Enter Username: <input type="text" name="username"> <br/><br/>
 	Update display name: <input type="text" name="displayname"> <br /><br />
+	Update email: <input type="text" name="email"> <br /><br />
     <input type="submit" name="postAction" value="<?= $postUpdate ?>"></p>
 </form></div>
