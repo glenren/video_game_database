@@ -66,28 +66,28 @@ function handleDeleteRequest()
 function handleUpdateRequest()
 {
     global $db_conn;
-    $old_name = $_POST['oldName'];
-    $new_name = $_POST['newName'];
-    // you need the wrap the old name and new name values with single quotations
-    executePlainSQL("UPDATE demoTable SET name='" . $new_name . "' WHERE name='" . $old_name . "'");
+    $username = $_POST['username'];
+	$displayname = $_POST['displayname'] ?? 'null';
+	
+	executePlainSQL("UPDATE Account SET displayname='" . $displayname . "' WHERE username='" . $username . "'");
 
     global $success;
     if (
         $success
         && oci_commit($db_conn)
     ) {
-        popUp("Successfully updated value!");
+        popUp("Successfully updated display name!");
     } else {
         popUp("Database Error");
     }
 }
 ?>
 
-<h3>Update Name in DemoTable</h3>
+<h3>Update Account Information</h3>
 <div class="outer"><p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 <br/>
 <form method="POST" action="index.php">
-    Old Name: <input type="text" name="oldName"> <br/><br/>
-    New Name: <input type="text" name="newName"> <br /><br />
+    Enter Username: <input type="text" name="username"> <br/><br/>
+	Update display name: <input type="text" name="displayname"> <br /><br />
     <input type="submit" name="postAction" value="<?= $postUpdate ?>"></p>
 </form></div>
