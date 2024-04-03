@@ -21,9 +21,9 @@ function handleInsertRequest()
         $success
         && oci_commit($db_conn)
     ) {
-        popUp("Successfully inserted your values into the table!");
+        popUp("Successfully added video game!");
     } else {
-        popUp("Database Error");
+        popUp("Please add the developer for this game first!");
     }
 }
 ?>
@@ -47,12 +47,12 @@ function handleDeleteRequest()
     //getting value from user and delete data from table
 	$name = $_POST['gameTitle'];
 
-	executePlainSQL("DELETE FROM VideoGameMadeBy WHERE Name='" . $name . "'");
+	executePlainSQL("DELETE FROM VideoGameMadeBy WHERE Name LIKE'" . $name . "' collate binary_ci");
 
     if (oci_commit($db_conn)) {
-        popUp("Successfully deleted value from table!");
+        popUp("Successfully deleted video game!");
     } else {
-        popUp("Database Error");
+        popUp("Couldn't add video game!");
     }
 }
 ?>
