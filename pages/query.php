@@ -260,7 +260,7 @@ function handleDisplayRequest()
 }
 ?>
 
-<h3>Display Tuples in DemoTable</h3>
+<h3>Display All Tables in Database</h3>
 <div class="outer"><form method="GET" action="index.php">
     <input type="submit" name="getAction" value="display"></p>
 </form></div>
