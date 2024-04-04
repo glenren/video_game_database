@@ -563,11 +563,15 @@ VALUES ('popcornman', '1382330', 'complete');
 INSERT INTO Adds(Username, GID, Status)
 VALUES ('dreamindream', '257510', 'backlog');
 INSERT INTO Adds(Username, GID, Status)
+VALUES ('dreamindream', '216878', 'backlog');
+INSERT INTO Adds(Username, GID, Status)
 VALUES ('heronboy', '1778820', 'playing');
 INSERT INTO Adds(Username, GID, Status)
 VALUES ('mobius', '101945', 'playing');
 INSERT INTO Adds(Username, GID, Status)
 VALUES ('mobius', '504230', 'complete');
+INSERT INTO Adds(Username, GID, Status)
+VALUES ('mobius', '216878', 'backlog');
 -- MakesReviewReviewing2
 INSERT INTO MakesReviewReviewing2(Category, Length)
 VALUES ('Medium', '300');

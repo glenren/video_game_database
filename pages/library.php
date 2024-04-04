@@ -230,16 +230,16 @@ function handleGETRequest()
     if (connectToDB()) {
         switch ($_GET['getAction']) {
             case $getCount:
-                handleCountRequest();
+                query\handleCountRequest();
                 break;
             case $getDisplay:
-                handleDisplayRequest();
+                query\handleDisplayRequest();
                 break;
             case $getSPJ:
-                handleSPJRequest();
+                query\handleSPJRequest();
                 break;
             case $getQuery:
-                handleQueryRequest();
+                query\handleQueryRequest();
                 break;
             case $getLookUp:
                 handleLookUpRequest();

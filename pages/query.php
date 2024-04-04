@@ -1,4 +1,72 @@
 <?php
+namespace query;
+
+function createCondition($inputWhereConCounter)
+{
+    $condition = "";
+    if (!empty($_GET['inputWhereVal2' . $inputWhereConCounter])) {
+        $val2 = $_GET['inputWhereVal2' . $inputWhereConCounter];
+        if (!ctype_digit($_GET['inputWhereOp' . $inputWhereConCounter])) {
+            $val2 = "'" . $val2 . "'";
+        }
+        $condition = $_GET['inputWhereVal1' . $inputWhereConCounter] .
+            $_GET['inputWhereOp' . $inputWhereConCounter] .
+            $val2;
+    }
+    return $condition;
+}
+
+function joinTwoTables($selectedTables) {
+    assert(count($selectedTables) > 1);
+    global $pklist;
+    $sharedColumns = array_intersect($pklist[$selectedTables[0]], $pklist[$selectedTables[1]]);
+    $query = " FROM " . $selectedTables[0] . " INNER JOIN " .
+        $selectedTables[1] . " ON (";
+    foreach ($sharedColumns as $key => $column) {
+        $query .= $selectedTables[0] . "." . $column .
+            "=" . $selectedTables[1] . "." . $column;
+    }
+    $query .= ")";
+    return $query;
+}
+
+function select() {
+    if (!empty($_GET["inputWhereCon"])) {
+        $query = " WHERE (";
+        $inputWhereConCounter = "";
+        while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
+            $query .= createCondition($inputWhereConCounter);
+            $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
+            $inputWhereConCounter .= "_";
+        }
+        $query .= ")";
+        return $query;
+    }
+    return "";
+}
+
+function project()
+{
+    global $db_conn;
+    // Sanitize table and column names
+    if (!areTokensOK()) {
+        return;
+    }
+    $query = "SELECT " . $_GET['inputSelect'];
+    $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
+    if (count($selectedTables) > 1) {
+        assert(count($selectedTables) == 2, "Two tables only supported for now.");
+        $query .= joinTwoTables($selectedTables);
+    } else {
+        $query .= $selectedTables[0];
+    }
+
+    return $query;
+}
+?>
+
+
+<?php
 function handleCountRequest()
 {
     global $db_conn;
@@ -17,56 +85,19 @@ function handleCountRequest()
 }
 ?>
 <h3>Number of Games in Database</h3>
-<div class="outer"><form method="GET" action="index.php">
-    <input type="submit" name="getAction" value="<?= $getCount ?>"></p>
-</form></div>
+<div class="outer">
+    <form method="GET" action="index.php">
+        <input type="submit" name="getAction" value="<?= $getCount ?>"></p>
+    </form>
+</div>
 
 
 
 <?php
 function handleSPJRequest()
 {
-    global $db_conn;
-    // Sanitize table and column names
-    if (!areTokensOK()) {
-        return;
-    }
-    $query = "SELECT " . $_GET['inputSelect'];
-    $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
-    global $pklist;
-    $sharedColumns = array_intersect($pklist[$selectedTables[0]], $pklist[$selectedTables[1]]);
-    $query .= " FROM " . $selectedTables[0] . " INNER JOIN " .
-        $selectedTables[1] . " ON (";
-    foreach ($sharedColumns as $key => $column) {
-        $query .= $selectedTables[0] . "." . $column .
-            "=" . $selectedTables[1] . "." . $column;
-    }
-    $query .= ")";
-
-    if (!empty($_GET["inputWhereCon"])) {
-        $query .= " WHERE (";
-        $inputWhereConCounter = "";
-        function createCondition($inputWhereConCounter)
-        {
-            $condition = "";
-            if (!empty($_GET['inputWhereVal2' . $inputWhereConCounter])) {
-                $val2 = $_GET['inputWhereVal2' . $inputWhereConCounter];
-                if (!ctype_digit($_GET['inputWhereOp' . $inputWhereConCounter])) {
-                    $val2 = "'" . $val2 . "'";
-                }
-                $condition = $_GET['inputWhereVal1' . $inputWhereConCounter] .
-                    $_GET['inputWhereOp' . $inputWhereConCounter] .
-                    $val2;
-            }
-            return $condition;
-        }
-        while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
-            $query .= createCondition($inputWhereConCounter);
-            $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
-            $inputWhereConCounter .= "_";
-        }
-        $query .= ")";
-    }
+    $query = project();
+    $query .= select();
     $results = executePlainSQL($query);
 
     global $success;
@@ -80,58 +111,43 @@ function handleSPJRequest()
 ?>
 
 <h3>SELECT PROJECT JOIN Query</h3>
-<div class="outer"><form method="GET" action="index.php">
-    FROM:
-    <select name="inputFrom" onChange="switchSelect(this);">
-        <?php
-        $temp = $pklist;
-        foreach ($pklist as $table => $columns) {
-            unset($temp[$table]);
-            foreach ($temp as $table2 => $columns2) {
-                if (empty(array_intersect($columns, $columns2))) {
-                    continue;
+<div class="outer">
+    <form method="GET" action="index.php">
+        FROM:
+        <select name="inputFrom" onChange="switchSelect(this);">
+            <?php
+            $temp = $pklist;
+            foreach ($pklist as $table => $columns) {
+                unset($temp[$table]);
+                foreach ($temp as $table2 => $columns2) {
+                    if (empty(array_intersect($columns, $columns2))) {
+                        continue;
+                    }
+                    $joinOption = $table . "," . $table2;
+                    echo "<option value=\"" . $joinOption . "\">" . $joinOption . "</option>";
                 }
-                $joinOption = $table . "," . $table2;
-                echo "<option value=\"" . $joinOption . "\">" . $joinOption . "</option>";
             }
-        }
-        ?>
-    </select><br/><br/>
-    <script>
-        function switchSelect(htmlFrom) {
-            elements = document.getElementsByClassName("selectOption");
-            for (let option of elements) {
-                option.style.display = "none";
-            }
-
-            let tables = htmlFrom.value.split(",");
-            tables.forEach(table => {
-                elements = document.getElementsByClassName("selectOption" + table);
+            ?>
+        </select><br /><br />
+        <script>
+            function switchSelect(htmlFrom) {
+                elements = document.getElementsByClassName("selectOption");
                 for (let option of elements) {
-                    option.style.display = "block";
+                    option.style.display = "none";
                 }
-            });
-        }
-    </script>
-    SELECT:
-    <select name="inputSelect">
-        <option value="*">*</option>
-        <?php
-        foreach ($columnslist as $table => $columns) {
-            foreach ($columns as $column) {
-                $class1 = "selectOption" . $table;
-                $class2 = "selectOption";
-                echo "<option " .
-                    "style=\"display:none\" " .
-                    "class=\"" . $class1 . " " . $class2 . "\" " .
-                    "value=\"" . $table . "." . $column . "\"" .
-                    ">" . $table . "." . $column . "</option>";
+
+                let tables = htmlFrom.value.split(",");
+                tables.forEach(table => {
+                    elements = document.getElementsByClassName("selectOption" + table);
+                    for (let option of elements) {
+                        option.style.display = "block";
+                    }
+                });
             }
-        }
-        ?>
-    </select><br/><br/>
-    WHERE:
-        <span><select name="inputWhereVal1">
+        </script>
+        SELECT:
+        <select name="inputSelect">
+            <option value="*">*</option>
             <?php
             foreach ($columnslist as $table => $columns) {
                 foreach ($columns as $column) {
@@ -145,45 +161,64 @@ function handleSPJRequest()
                 }
             }
             ?>
-        </select>
-        <select name="inputWhereOp">
-            <?php
-            foreach ($operators as $operator) {
-                echo "<option " .
-                    "value=\"" . $operator . "\"" .
-                    ">" . $operator . "</option>";
+        </select><br /><br />
+        WHERE:
+        <span><select name="inputWhereVal1">
+                <?php
+                foreach ($columnslist as $table => $columns) {
+                    foreach ($columns as $column) {
+                        $class1 = "selectOption" . $table;
+                        $class2 = "selectOption";
+                        echo "<option " .
+                            "style=\"display:none\" " .
+                            "class=\"" . $class1 . " " . $class2 . "\" " .
+                            "value=\"" . $table . "." . $column . "\"" .
+                            ">" . $table . "." . $column . "</option>";
+                    }
+                }
+                ?>
+            </select>
+            <select name="inputWhereOp">
+                <?php
+                foreach ($operators as $operator) {
+                    echo "<option " .
+                        "value=\"" . $operator . "\"" .
+                        ">" . $operator . "</option>";
+                }
+                ?>
+            </select>
+            <input name="inputWhereVal2">
+            <select name="inputWhereCon" onChange="changeWhere(this)">
+                <option value=""></option>
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+            </select><br /><br /></span>
+        <script>
+            var inputWhereConCounter = "_";
+            function changeWhere(menu) {
+                if (menu.value == "") {
+                    let divElements = menu.parentElement.getElementsByTagName("span");
+                    if (divElements.length == 0) {
+                        return;
+                    }
+                    divElements[0].remove();
+                } else {
+                    if (menu.parentElement.getElementsByTagName("div").length != 0) {
+                        return;
+                    }
+                    menu2 = menu.parentElement.cloneNode(true);
+                    for (const child of menu2.children) {
+                        child.setAttribute("name", child.getAttribute("name") + inputWhereConCounter);
+                    }
+                    menu.parentElement.appendChild(menu2);
+                }
             }
-            ?>
-        </select>
-        <input name="inputWhereVal2">
-        <select name="inputWhereCon" onChange="changeWhere(this)">
-            <option value=""></option>
-            <option value="AND">AND</option>
-            <option value="OR">OR</option>
-        </select><br/><br/></span>
-    <script>
-        var inputWhereConCounter = "_";
-        function changeWhere(menu) {
-            if (menu.value == "") {
-                let divElements = menu.parentElement.getElementsByTagName("span");
-                if (divElements.length == 0) {
-                    return;
-                }
-                divElements[0].remove();
-            } else {
-                if (menu.parentElement.getElementsByTagName("div").length != 0) {
-                    return;
-                }
-                menu2 = menu.parentElement.cloneNode(true);
-                for (const child of menu2.children) {
-                    child.setAttribute("name", child.getAttribute("name") + inputWhereConCounter);
-                }
-                menu.parentElement.appendChild(menu2);
-            }
-        }
-    </script>
-    <input type="submit" name="getAction" value="<?= $getSPJ ?>"></p>
-</form></div>
+        </script>
+        <input type="submit" name="getAction" value="<?= $getSPJ ?>"></p>
+    </form>
+</div>
+
+
 
 <?php
 function handleQueryRequest()
@@ -215,33 +250,35 @@ function handleQueryRequest()
 }
 ?>
 <h3>General Query</h3>
-<div class="outer"><form method="GET" action="index.php">
-    FROM:
-    <select name="inputFrom">
-        <?php
-        $temp = $pklist;
-        foreach ($pklist as $table => $columns) {
-            unset($temp[$table]);
-            foreach ($temp as $table2 => $columns2) {
-                if (empty(array_intersect($columns, $columns2))) {
-                    continue;
+<div class="outer">
+    <form method="GET" action="index.php">
+        FROM:
+        <select name="inputFrom">
+            <?php
+            $temp = $pklist;
+            foreach ($pklist as $table => $columns) {
+                unset($temp[$table]);
+                foreach ($temp as $table2 => $columns2) {
+                    if (empty(array_intersect($columns, $columns2))) {
+                        continue;
+                    }
+                    $joinOption = $table . "," . $table2;
+                    echo "<option value=\"" . $joinOption . "\">" . $joinOption . "</option>";
                 }
-                $joinOption = $table . "," . $table2;
-                echo "<option value=\"" . $joinOption . "\">" . $joinOption . "</option>";
             }
-        }
-        ?>
-    </select><br/><br/>
-    SELECT Column: <input type="text" name="inputSelect">
-    <br/><br/>
-    WHERE Column: <input type="text" name="inputWhere">
-    <br/><br/>
-    GROUP BY: <input type="text" name="inputGroupBy">
-    <br/><br/>
-    HAVING: <input type="text" name="inputHaving">
-    <br/><br/>
-    <input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
-</form></div>
+            ?>
+        </select><br /><br />
+        SELECT Column: <input type="text" name="inputSelect">
+        <br /><br />
+        WHERE Column: <input type="text" name="inputWhere">
+        <br /><br />
+        GROUP BY: <input type="text" name="inputGroupBy">
+        <br /><br />
+        HAVING: <input type="text" name="inputHaving">
+        <br /><br />
+        <input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
+    </form>
+</div>
 
 
 
@@ -260,7 +297,9 @@ function handleDisplayRequest()
 }
 ?>
 
-<h3>Display All Tables in Database</h3>
-<div class="outer"><form method="GET" action="index.php">
-    <input type="submit" name="getAction" value="display"></p>
-</form></div>
+<h3>Display Tuples in DemoTable</h3>
+<div class="outer">
+    <form method="GET" action="index.php">
+        <input type="submit" name="getAction" value="display"></p>
+    </form>
+</div>
