@@ -98,7 +98,6 @@ class Query
 
     public static function project()
     {
-        global $db_conn;
         // Sanitize table and column names
         if (!Query::areTokensOK()) {
             return;
@@ -121,7 +120,6 @@ class Query
 <?php
 function handleCountRequest()
 {
-    global $db_conn;
     $result = SQL::executePlainSQL("SELECT Count(*) FROM VideoGameMadeBy");
 
     global $success;
@@ -187,7 +185,6 @@ function handleSPJRequest()
                 for (let option of elements) {
                     option.style.display = "none";
                 }
-
                 let tables = htmlFrom.value.split(",");
                 tables.forEach(table => {
                     elements = document.getElementsByClassName("selectOption" + table);
@@ -275,7 +272,6 @@ function handleSPJRequest()
 <?php
 function handleQueryRequest()
 {
-    global $db_conn;
     // Sanitize table and column names
     if (!Query::areTokensOK()) {
         return;
@@ -291,7 +287,6 @@ function handleQueryRequest()
         $query .= " HAVING (" . $_GET['inputHaving'] . ")";
     }
     $results = SQL::executePlainSQL($query);
-
     global $success;
     if ($success) {
         //popUp("Success");
@@ -337,12 +332,11 @@ function handleQueryRequest()
 <?php
 function handleDisplayRequest()
 {
-    global $db_conn;
     $commands = SQL::sql_file_to_array("select.sql");
     foreach ($commands as $command) {
         if (trim($command)) {
             $result = SQL::executePlainSQL($command);
-            oci_commit($db_conn);
+            oci_commit(SQL::$db_conn);
             printResult($result);
         }
     }

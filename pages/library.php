@@ -71,9 +71,8 @@ function login($creds)
 
 function fetch_table($query)
 {
-    global $db_conn;
     $statement = SQL::executePlainSQL($query);
-    oci_commit($db_conn);
+    oci_commit(SQL::$db_conn);
     $table_column_pair = array();
     $nrows = oci_fetch_all($statement, $table_column_pair);
     $tables = array();
@@ -160,12 +159,12 @@ class SQL
 
     public static function executePlainSQL($cmdstr)
     {
-        global $db_conn, $success;
-        $statement = oci_parse($db_conn, $cmdstr);
+        global $success;
+        $statement = oci_parse(SQL::$db_conn, $cmdstr);
 
         if (!$statement) {
             echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-            $e = OCI_Error($db_conn); // For oci_parse errors pass the connection handle
+            $e = OCI_Error(SQL::$db_conn); // For oci_parse errors pass the connection handle
             echo htmlentities($e['message']);
             $success = False;
         }
@@ -187,11 +186,11 @@ class SQL
          * Bound variables cause a statement to only be parsed once and you can reuse the statement.
          * This is also very useful in protecting against SQL injection.
          */
-        global $db_conn, $success;
-        $statement = oci_parse($db_conn, $cmdstr);
+        global $success;
+        $statement = oci_parse(SQL::$db_conn, $cmdstr);
         if (!$statement) {
             echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-            $e = OCI_Error($db_conn);
+            $e = OCI_Error(SQL::$db_conn);
             echo htmlentities($e['message']);
             $success = False;
         }
@@ -215,10 +214,9 @@ class SQL
 
     public static function connectToDB()
     {
-        global $db_conn;
         global $config;
-        $db_conn = oci_connect($config["dbuser"], $config["dbpassword"], $config["dbserver"]);
-        if ($db_conn) {
+        SQL::$db_conn = oci_connect($config["dbuser"], $config["dbpassword"], $config["dbserver"]);
+        if (SQL::$db_conn) {
             debugAlertMessage("Database is Connected");
             return true;
         } else {
@@ -231,9 +229,8 @@ class SQL
 
     public static function disconnectFromDB()
     {
-        global $db_conn;
         debugAlertMessage("Disconnect from Database");
-        oci_close($db_conn);
+        oci_close(SQL::$db_conn);
     }
     public static function sql_file_to_array($location)
     {
@@ -256,13 +253,12 @@ class SQL
 
     public static function run_sql_file($location)
     {
-        global $db_conn;
         $commands = SQL::sql_file_to_array($location);
         $total = $success = 0;
         foreach ($commands as $command) {
             if (trim($command)) {
                 $success += (@SQL::executePlainSQL($command) == false ? 0 : 1);
-                oci_commit($db_conn);
+                oci_commit(SQL::$db_conn);
                 $total += 1;
             }
         }

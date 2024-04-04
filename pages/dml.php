@@ -1,7 +1,6 @@
 <?php
 function handleInsertRequest()
 {
-    global $db_conn;
     //Getting the values from user and insert data into the table
     $tuple = array(
         ":bind1" => rand(),
@@ -19,7 +18,7 @@ function handleInsertRequest()
     global $success;
     if (
         $success
-        && oci_commit($db_conn)
+        && oci_commit(SQL::$db_conn)
     ) {
         popUp("Successfully added video game!");
     } else {
@@ -43,13 +42,12 @@ function handleInsertRequest()
 <?php
 function handleDeleteRequest()
 {
-    global $db_conn;
     //getting value from user and delete data from table
 	$name = $_POST['gameTitle'];
 
 	SQL::executePlainSQL("DELETE FROM VideoGameMadeBy WHERE Name LIKE'" . $name . "' collate binary_ci");
 
-    if (oci_commit($db_conn)) {
+    if (oci_commit(SQL::$db_conn)) {
         popUp("Successfully deleted video game!");
     } else {
         popUp("Couldn't add video game!");
@@ -65,7 +63,6 @@ function handleDeleteRequest()
 <?php
 function handleUpdateRequest()
 {
-    global $db_conn;
     $username = $_POST['username'];
 	$displayname = $_POST['displayname'] ?? 'default';
 	$email = $_POST['email'] ?? 'email';
@@ -75,7 +72,7 @@ function handleUpdateRequest()
     global $success;
     if (
         $success
-        && oci_commit($db_conn)
+        && oci_commit(SQL::$db_conn)
     ) {
         popUp("Successfully updated account!");
     } else {

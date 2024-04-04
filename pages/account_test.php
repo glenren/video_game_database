@@ -42,8 +42,6 @@ login($creds);
 		<?php
 		function handleSearchRequest()
 		{
-			global $db_conn;
-
 			if (!$_GET['insName']) {
 				popUp("Please enter a username!");
 				return;
@@ -54,7 +52,7 @@ login($creds);
 
 			debug_to_console($command);
 			$result = SQL::executePlainSQL($command);
-			oci_commit($db_conn);
+			oci_commit(SQL::$db_conn);
 			echo "<h2>Games added by user <i><u>" . $_GET['insName'] . "</u></i>:</h2>";
 			printResult($result);
 		}
