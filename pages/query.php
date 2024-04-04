@@ -50,6 +50,23 @@ class Query
         // }
         return true;
     }
+
+    public static function select()
+    {
+        if (!empty($_GET["inputWhereVal2"])) {
+            $query = " WHERE (";
+            $inputWhereConCounter = "";
+            while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
+                $query .= Query::createCondition($inputWhereConCounter);
+                $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
+                $inputWhereConCounter .= "_";
+            }
+            $query .= ")";
+            return $query;
+        }
+        return "";
+    }
+
     public static function createCondition($inputWhereConCounter)
     {
         $condition = "";
@@ -65,18 +82,21 @@ class Query
         return $condition;
     }
 
-    public static function joinTwoTables($selectedTables)
+    public static function project()
     {
-        assert(count($selectedTables) > 1);
-        global $pklist;
-        $sharedColumns = array_intersect($pklist[$selectedTables[0]], $pklist[$selectedTables[1]]);
-        $query = " FROM " . $selectedTables[0] . " INNER JOIN " .
-            $selectedTables[1] . " ON (";
-        foreach ($sharedColumns as $key => $column) {
-            $query .= $selectedTables[0] . "." . $column .
-                "=" . $selectedTables[1] . "." . $column;
+        // Sanitize table and column names
+        if (!Query::areTokensOK()) {
+            return;
         }
-        $query .= ")";
+        $query = Query::projectColumns();
+        $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
+        if (count($selectedTables) > 1) {
+            assert(count($selectedTables) == 2, "Two tables only supported for now.");
+            $query .= Query::joinTwoTables($selectedTables);
+        } else {
+            $query .= $selectedTables[0];
+        }
+
         return $query;
     }
 
@@ -98,37 +118,18 @@ class Query
         return "";
     }
 
-    public static function select()
+    public static function joinTwoTables($selectedTables)
     {
-        if (!empty($_GET["inputWhereVal2"])) {
-            $query = " WHERE (";
-            $inputWhereConCounter = "";
-            while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
-                $query .= Query::createCondition($inputWhereConCounter);
-                $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
-                $inputWhereConCounter .= "_";
-            }
-            $query .= ")";
-            return $query;
+        assert(count($selectedTables) > 1);
+        global $pklist;
+        $sharedColumns = array_intersect($pklist[$selectedTables[0]], $pklist[$selectedTables[1]]);
+        $query = " FROM " . $selectedTables[0] . " INNER JOIN " .
+            $selectedTables[1] . " ON (";
+        foreach ($sharedColumns as $key => $column) {
+            $query .= $selectedTables[0] . "." . $column .
+                "=" . $selectedTables[1] . "." . $column;
         }
-        return "";
-    }
-
-    public static function project()
-    {
-        // Sanitize table and column names
-        if (!Query::areTokensOK()) {
-            return;
-        }
-        $query = Query::projectColumns();
-        $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
-        if (count($selectedTables) > 1) {
-            assert(count($selectedTables) == 2, "Two tables only supported for now.");
-            $query .= Query::joinTwoTables($selectedTables);
-        } else {
-            $query .= $selectedTables[0];
-        }
-
+        $query .= ")";
         return $query;
     }
 }
@@ -406,6 +407,8 @@ function handleDisplayRequest()
     $commands = SQL::sql_file_to_array("select.sql");
     foreach ($commands as $command) {
         if (trim($command)) {
+            $table = explode(" ", $command)[3];
+            echo "<h2>" . $table . "</h2>";
             $result = SQL::executePlainSQL($command);
             printResult($result);
         }
@@ -413,7 +416,7 @@ function handleDisplayRequest()
 }
 ?>
 
-<h3>Display Tuples in DemoTable</h3>
+<h3>Display Tuples in Database</h3>
 <div class="outer">
     <form method="GET" action="index.php">
         <input type="submit" name="getAction" value="display"></p>
