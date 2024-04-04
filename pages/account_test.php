@@ -67,7 +67,9 @@ login($creds);
 			</form>
 		</div>
 
+		<?php
 		handleRequests();
+		?>
 	</div>
 </body>
 
