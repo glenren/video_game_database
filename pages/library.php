@@ -27,6 +27,7 @@ $getLookUp = 'Search';
 $getSPJ = 'SPJ';
 $getQuery = 'query';
 $postDelete = 'delete';
+$getDivide = 'divide';
 
 // Operators for WHERE clause
 $operators = array(

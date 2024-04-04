@@ -162,7 +162,6 @@ function handleCountRequest()
 
 
 <?php
-
 function handleSPJRequest()
 {
     $query = Query::project();
@@ -311,6 +310,35 @@ function handleSPJRequest()
 
 
 <?php
+function handleDivideRequest()
+{
+    $command = "SELECT DISTINCT A.username
+        FROM Adds A
+        WHERE NOT EXISTS (
+            SELECT GID 
+            FROM VideoGameMadeBy V
+            WHERE NOT EXISTS (
+                SELECT A2.GID
+                FROM Adds A2
+                WHERE A2.GID = V.GID
+                AND A.username = A2.username))";
+    $result = SQL::executePlainSQL($command);
+    printResult($result);
+}
+?>
+
+<h3>Divide Query</h3>
+<p>Finds all accounts that owns all games.</p>
+<div class="outer">
+    <form method="GET" action="index.php">
+        <input type="submit" name="getAction" value="<?php echo $getDivide?>"></p>
+    </form>
+</div>
+
+
+
+
+<?php
 function handleQueryRequest()
 {
     // Sanitize table and column names
@@ -377,7 +405,6 @@ function handleDisplayRequest()
     foreach ($commands as $command) {
         if (trim($command)) {
             $result = SQL::executePlainSQL($command);
-            oci_commit(SQL::$db_conn);
             printResult($result);
         }
     }
