@@ -50,7 +50,6 @@ login($creds);
 			$command = "SELECT g.Name, g.DevTeamName, g.Category, a.Status FROM VideoGameMadeBy g, Adds a "
 				. "WHERE a.Username = '" . $_GET['insName'] . "' AND a.GID = g.GID";
 
-			debug_to_console($command);
 			$result = SQL::executePlainSQL($command);
 			oci_commit(SQL::$db_conn);
 			echo "<h2>Games added by user <i><u>" . $_GET['insName'] . "</u></i>:</h2>";
