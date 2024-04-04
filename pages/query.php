@@ -184,8 +184,10 @@ function handleSPJRequest()
         FROM:
         <select name="inputFrom" onChange="switchSelect(this);">
             <?php
+            
             $temp = $pklist;
             foreach ($pklist as $table => $columns) {
+                echo "<option value=\"" . $table . "\">" . $table . "</option>";
                 unset($temp[$table]);
                 foreach ($temp as $table2 => $columns2) {
                     if (empty(array_intersect($columns, $columns2))) {
