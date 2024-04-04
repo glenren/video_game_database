@@ -94,7 +94,7 @@ class Query
             assert(count($selectedTables) == 2, "Two tables only supported for now.");
             $query .= Query::joinTwoTables($selectedTables);
         } else {
-            $query .= $selectedTables[0];
+            $query .= " FROM " . $selectedTables[0];
         }
 
         return $query;
