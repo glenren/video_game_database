@@ -100,7 +100,7 @@ class Query
 
     public static function select()
     {
-        if (!empty($_GET["inputWhereCon"])) {
+        if (!empty($_GET["inputWhereVal2"])) {
             $query = " WHERE (";
             $inputWhereConCounter = "";
             while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
