@@ -143,18 +143,9 @@ function handleRequests()
         popUp("Could not connect to database when handling request.");
     }
     if (isset($_POST['postAction'])) {
-        global $postReset;
-        global $postUpdate;
-        global $postInsert;
-        global $postDelete;
-        ("handle" . $_GET['postAction'] . "Request")();
+        ("handle" . $_POST['postAction'] . "Request")();
     }
     if (isset($_GET['getAction'])) {
-        global $getCount;
-        global $getDisplay;
-        global $getQuery;
-        global $getSPJ;
-        global $getLookUp;
         ("handle" . $_GET['getAction'] . "Request")();
     }
     SQL::disconnectFromDB();
