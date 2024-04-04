@@ -190,64 +190,6 @@ function disconnectFromDB()
     oci_close($db_conn);
 }
 
-// HANDLE ALL POST ROUTES
-// A better coding practice is to have one method that reroutes your requests accordingly. It will make it easier to add/remove functionality.
-function handlePOSTRequest()
-{
-    global $postReset;
-    global $postUpdate;
-    global $postInsert;
-    global $postDelete;
-    if (connectToDB()) {
-        switch ($_POST['postAction']) {
-            case $postReset:
-                handleResetRequest();
-                break;
-            case $postUpdate:
-                handleUpdateRequest();
-                break;
-            case $postInsert:
-                handleInsertRequest();
-                break;
-            case $postDelete:
-                handleDeleteRequest();
-                break;
-        }
-        disconnectFromDB();
-    }
-}
-
-// HANDLE ALL GET ROUTES
-// A better coding practice is to have one method that reroutes your requests accordingly.
-// It will make it easier to add/remove functionality.
-function handleGETRequest()
-{
-    global $getCount;
-    global $getDisplay;
-    global $getQuery;
-    global $getSPJ;
-    global $getLookUp;
-    if (connectToDB()) {
-        switch ($_GET['getAction']) {
-            case $getCount:
-                query\handleCountRequest();
-                break;
-            case $getDisplay:
-                query\handleDisplayRequest();
-                break;
-            case $getSPJ:
-                query\handleSPJRequest();
-                break;
-            case $getQuery:
-                query\handleQueryRequest();
-                break;
-            case $getLookUp:
-                handleLookUpRequest();
-                break;
-        }
-        disconnectFromDB();
-    }
-}
 
 function printResult($result)
 { //prints results from a select statement

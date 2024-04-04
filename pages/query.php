@@ -1,67 +1,71 @@
 <?php
-namespace query;
 
-function createCondition($inputWhereConCounter)
+class SQL
 {
-    $condition = "";
-    if (!empty($_GET['inputWhereVal2' . $inputWhereConCounter])) {
-        $val2 = $_GET['inputWhereVal2' . $inputWhereConCounter];
-        if (!ctype_digit($_GET['inputWhereOp' . $inputWhereConCounter])) {
-            $val2 = "'" . $val2 . "'";
+    public static function createCondition($inputWhereConCounter)
+    {
+        $condition = "";
+        if (!empty($_GET['inputWhereVal2' . $inputWhereConCounter])) {
+            $val2 = $_GET['inputWhereVal2' . $inputWhereConCounter];
+            if (!ctype_digit($_GET['inputWhereOp' . $inputWhereConCounter])) {
+                $val2 = "'" . $val2 . "'";
+            }
+            $condition = $_GET['inputWhereVal1' . $inputWhereConCounter] .
+                $_GET['inputWhereOp' . $inputWhereConCounter] .
+                $val2;
         }
-        $condition = $_GET['inputWhereVal1' . $inputWhereConCounter] .
-            $_GET['inputWhereOp' . $inputWhereConCounter] .
-            $val2;
+        return $condition;
     }
-    return $condition;
-}
 
-function joinTwoTables($selectedTables) {
-    assert(count($selectedTables) > 1);
-    global $pklist;
-    $sharedColumns = array_intersect($pklist[$selectedTables[0]], $pklist[$selectedTables[1]]);
-    $query = " FROM " . $selectedTables[0] . " INNER JOIN " .
-        $selectedTables[1] . " ON (";
-    foreach ($sharedColumns as $key => $column) {
-        $query .= $selectedTables[0] . "." . $column .
-            "=" . $selectedTables[1] . "." . $column;
-    }
-    $query .= ")";
-    return $query;
-}
-
-function select() {
-    if (!empty($_GET["inputWhereCon"])) {
-        $query = " WHERE (";
-        $inputWhereConCounter = "";
-        while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
-            $query .= createCondition($inputWhereConCounter);
-            $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
-            $inputWhereConCounter .= "_";
+    public static function joinTwoTables($selectedTables)
+    {
+        assert(count($selectedTables) > 1);
+        global $pklist;
+        $sharedColumns = array_intersect($pklist[$selectedTables[0]], $pklist[$selectedTables[1]]);
+        $query = " FROM " . $selectedTables[0] . " INNER JOIN " .
+            $selectedTables[1] . " ON (";
+        foreach ($sharedColumns as $key => $column) {
+            $query .= $selectedTables[0] . "." . $column .
+                "=" . $selectedTables[1] . "." . $column;
         }
         $query .= ")";
         return $query;
     }
-    return "";
-}
 
-function project()
-{
-    global $db_conn;
-    // Sanitize table and column names
-    if (!areTokensOK()) {
-        return;
-    }
-    $query = "SELECT " . $_GET['inputSelect'];
-    $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
-    if (count($selectedTables) > 1) {
-        assert(count($selectedTables) == 2, "Two tables only supported for now.");
-        $query .= joinTwoTables($selectedTables);
-    } else {
-        $query .= $selectedTables[0];
+    public static function select()
+    {
+        if (!empty($_GET["inputWhereCon"])) {
+            $query = " WHERE (";
+            $inputWhereConCounter = "";
+            while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
+                $query .= createCondition($inputWhereConCounter);
+                $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
+                $inputWhereConCounter .= "_";
+            }
+            $query .= ")";
+            return $query;
+        }
+        return "";
     }
 
-    return $query;
+    public static function project()
+    {
+        global $db_conn;
+        // Sanitize table and column names
+        if (!areTokensOK()) {
+            return;
+        }
+        $query = "SELECT " . $_GET['inputSelect'];
+        $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
+        if (count($selectedTables) > 1) {
+            assert(count($selectedTables) == 2, "Two tables only supported for now.");
+            $query .= SQL::joinTwoTables($selectedTables);
+        } else {
+            $query .= $selectedTables[0];
+        }
+
+        return $query;
+    }
 }
 ?>
 
@@ -96,8 +100,8 @@ function handleCountRequest()
 <?php
 function handleSPJRequest()
 {
-    $query = project();
-    $query .= select();
+    $query = SQL::project();
+    $query .= SQL::select();
     $results = executePlainSQL($query);
 
     global $success;
