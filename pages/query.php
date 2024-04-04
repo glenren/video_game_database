@@ -1,7 +1,55 @@
 <?php
 
-class SQL
+class Query
 {
+    public static function areTokensOK()
+    {
+        global $pklist;
+        global $columnslist;
+        global $operators;
+
+        $_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
+        trim($_GET['inputFrom']);
+        $tablesFrom = preg_split("/,/", $_GET["inputFrom"]);
+        foreach ($tablesFrom as $table) {
+            if (!in_array($table, array_keys($pklist))) {
+                popUp("Invalid table");
+                return false;
+            }
+        }
+
+        $_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
+        $inSelectedTables = false;
+        if ($_GET['inputSelect'] != "*") {
+            foreach ($tablesFrom as $table) {
+                $column = preg_split("/\./", $_GET['inputSelect'])[1];
+                var_dump($column);
+                if (in_array($column, $columnslist[$table])) {
+                    $inSelectedTables = true;
+                    break;
+                }
+            }
+        }
+        if (
+            !$inSelectedTables
+            && $_GET['inputSelect'] != "*"
+        ) {
+            popUp("Invalid Column");
+            return false;
+        }
+
+        // $conditionList = preg_split("/(and)|(or)/i", $_GET['inputWhere']);
+        // foreach ($conditionList as $condition) {
+        // 	$pieces = preg_split("/\s*/", $condition);
+        // 	foreach ($pieces as $piece) {
+        // 		if (!in_array($piece, $tablesFrom)
+        // 			&& !in_array($piece, $operators)) {
+        // 				return false;
+        // 		}
+        // 	}
+        // }
+        return true;
+    }
     public static function createCondition($inputWhereConCounter)
     {
         $condition = "";
@@ -38,7 +86,7 @@ class SQL
             $query = " WHERE (";
             $inputWhereConCounter = "";
             while (isset($_GET["inputWhereCon" . $inputWhereConCounter])) {
-                $query .= createCondition($inputWhereConCounter);
+                $query .= Query::createCondition($inputWhereConCounter);
                 $query .= " " . $_GET["inputWhereCon" . $inputWhereConCounter] . " ";
                 $inputWhereConCounter .= "_";
             }
@@ -52,14 +100,14 @@ class SQL
     {
         global $db_conn;
         // Sanitize table and column names
-        if (!areTokensOK()) {
+        if (!Query::areTokensOK()) {
             return;
         }
         $query = "SELECT " . $_GET['inputSelect'];
         $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
         if (count($selectedTables) > 1) {
             assert(count($selectedTables) == 2, "Two tables only supported for now.");
-            $query .= SQL::joinTwoTables($selectedTables);
+            $query .= Query::joinTwoTables($selectedTables);
         } else {
             $query .= $selectedTables[0];
         }
@@ -74,7 +122,7 @@ class SQL
 function handleCountRequest()
 {
     global $db_conn;
-    $result = executePlainSQL("SELECT Count(*) FROM VideoGameMadeBy");
+    $result = SQL::executePlainSQL("SELECT Count(*) FROM VideoGameMadeBy");
 
     global $success;
     if (
@@ -100,9 +148,9 @@ function handleCountRequest()
 <?php
 function handleSPJRequest()
 {
-    $query = SQL::project();
-    $query .= SQL::select();
-    $results = executePlainSQL($query);
+    $query = Query::project();
+    $query .= Query::select();
+    $results = SQL::executePlainSQL($query);
 
     global $success;
     if ($success) {
@@ -229,7 +277,7 @@ function handleQueryRequest()
 {
     global $db_conn;
     // Sanitize table and column names
-    if (!areTokensOK()) {
+    if (!Query::areTokensOK()) {
         return;
     }
     $query = "SELECT " . $_GET['inputSelect'] . " FROM " . $_GET['inputFrom'];
@@ -242,7 +290,7 @@ function handleQueryRequest()
     if (!empty($_GET['inputHaving'])) {
         $query .= " HAVING (" . $_GET['inputHaving'] . ")";
     }
-    $results = executePlainSQL($query);
+    $results = SQL::executePlainSQL($query);
 
     global $success;
     if ($success) {
@@ -290,10 +338,10 @@ function handleQueryRequest()
 function handleDisplayRequest()
 {
     global $db_conn;
-    $commands = sql_file_to_array("select.sql");
+    $commands = SQL::sql_file_to_array("select.sql");
     foreach ($commands as $command) {
         if (trim($command)) {
-            $result = executePlainSQL($command);
+            $result = SQL::executePlainSQL($command);
             oci_commit($db_conn);
             printResult($result);
         }

@@ -53,7 +53,7 @@ login($creds);
 				. "WHERE a.Username = '" . $_GET['insName'] . "' AND a.GID = g.GID";
 
 			debug_to_console($command);
-			$result = executePlainSQL($command);
+			$result = SQL::executePlainSQL($command);
 			oci_commit($db_conn);
 			echo "<h2>Games added by user <i><u>" . $_GET['insName'] . "</u></i>:</h2>";
 			printResult($result);
@@ -67,15 +67,7 @@ login($creds);
 			</form>
 		</div>
 
-		<?php
-		if (isset($_POST['postAction'])) {
-			handlePOSTRequest();
-		} else if (
-			isset($_GET['getAction'])
-		) {
-			handleGETRequest();
-		}
-		?>
+		handleRequests();
 	</div>
 </body>
 

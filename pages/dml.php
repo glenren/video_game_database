@@ -14,7 +14,7 @@ function handleInsertRequest()
     $alltuples = array(
         $tuple
     );
-    executeBoundSQL("INSERT INTO VideoGameMadeBy VALUES (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
+    SQL::executeBoundSQL("INSERT INTO VideoGameMadeBy VALUES (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $alltuples);
 
     global $success;
     if (
@@ -47,7 +47,7 @@ function handleDeleteRequest()
     //getting value from user and delete data from table
 	$name = $_POST['gameTitle'];
 
-	executePlainSQL("DELETE FROM VideoGameMadeBy WHERE Name LIKE'" . $name . "' collate binary_ci");
+	SQL::executePlainSQL("DELETE FROM VideoGameMadeBy WHERE Name LIKE'" . $name . "' collate binary_ci");
 
     if (oci_commit($db_conn)) {
         popUp("Successfully deleted video game!");
@@ -70,7 +70,7 @@ function handleUpdateRequest()
 	$displayname = $_POST['displayname'] ?? 'default';
 	$email = $_POST['email'] ?? 'email';
 	
-	executePlainSQL("UPDATE Account SET email='" . $email . "', displayname='" . $displayname . "' WHERE username='" . $username . "'");
+	SQL::executePlainSQL("UPDATE Account SET email='" . $email . "', displayname='" . $displayname . "' WHERE username='" . $username . "'");
 
     global $success;
     if (

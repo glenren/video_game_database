@@ -16,29 +16,6 @@
 -->
 <?php
 require ("pages/library.php");
-
-function handleRequests()
-{
-    if (!connectToDB()) {
-        popUp("Could not connect to database when handling request.");
-    }
-    if (isset($_POST['postAction'])) {
-        global $postReset;
-        global $postUpdate;
-        global $postInsert;
-        global $postDelete;
-        ("handle" . $_GET['postAction'] . "Request")();
-    }
-    if (isset($_GET['getAction'])) {
-        global $getCount;
-        global $getDisplay;
-        global $getQuery;
-        global $getSPJ;
-        global $getLookUp;
-        ("handle" . $_GET['getAction'] . "Request")();
-    }
-    disconnectFromDB();
-}
 ?>
 
 <html>
@@ -79,7 +56,7 @@ function handleRequests()
         function handleResetRequest()
         {
             // Drop old table and create new ones
-            run_sql_file("database.sql");
+            SQL::run_sql_file("database.sql");
             popUp("Reset successful!");
         }
         ?>

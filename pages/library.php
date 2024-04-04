@@ -14,7 +14,6 @@ if (file_exists("credentials.txt")) {
     onPageLoad();
 }
 
-$db_conn = NULL;	// login credentials are used in connectToDB()
 $success = true;	// keep track of errors so page redirects only if there are no errors
 $show_debug_alert_messages = False; // show which methods are being triggered (see debugAlertMessage())
 
@@ -28,6 +27,16 @@ $getLookUp = 'Search';
 $getSPJ = 'SPJ';
 $getQuery = 'query';
 $postDelete = 'delete';
+
+// Operators for WHERE clause
+$operators = array(
+    "=",
+    "<>",
+    ">",
+    ">=",
+    "<",
+    "<=",
+);
 ?>
 
 
@@ -35,7 +44,7 @@ $postDelete = 'delete';
 <?php
 function onPageLoad()
 {
-    connectToDB();
+    SQL::connectToDB();
     global $pklist;
     global $columnslist;
     $pklist = fetch_table("
@@ -48,7 +57,7 @@ function onPageLoad()
     $columnslist = fetch_table("
         SELECT tab_col.table_name, tab_col.column_name
         FROM USER_TAB_COLUMNS tab_col ");
-    disconnectFromDB();
+    SQL::disconnectFromDB();
 }
 
 function login($creds)
@@ -63,7 +72,7 @@ function login($creds)
 function fetch_table($query)
 {
     global $db_conn;
-    $statement = executePlainSQL($query);
+    $statement = SQL::executePlainSQL($query);
     oci_commit($db_conn);
     $table_column_pair = array();
     $nrows = oci_fetch_all($statement, $table_column_pair);
@@ -86,8 +95,6 @@ function debug_to_console($data)
     echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
 }
 
-
-// Other functions
 function debugAlertMessage($message)
 {
     global $show_debug_alert_messages;
@@ -101,96 +108,6 @@ function popUp($message)
     echo "<script>alert('$message');</script>";
 }
 
-function executePlainSQL($cmdstr)
-{ //takes a plain (no bound variables) SQL command and executes it
-    //echo "<br>running ".$cmdstr."<br>";
-    global $db_conn, $success;
-    $statement = oci_parse($db_conn, $cmdstr);
-    //There are a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
-    if (!$statement) {
-        echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-        $e = OCI_Error($db_conn); // For oci_parse errors pass the connection handle
-        echo htmlentities($e['message']);
-        $success = False;
-    }
-    $r = oci_execute($statement, OCI_DEFAULT);
-    if (!$r) {
-        echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-        $e = oci_error($statement); // For oci_execute errors pass the statementhandle
-        echo htmlentities($e['message']);
-        $success = False;
-    }
-    return $statement;
-}
-
-function executeBoundSQL($cmdstr, $list)
-{
-    /*
-     * Sometimes the same statement will be executed several times with different values for the variables involved in the query.
-     * In this case you don't need to create the statement several times.
-     * Bound variables cause a statement to only be parsed once and you can reuse the statement.
-     * This is also very useful in protecting against SQL injection.
-     * See the sample code below for how this function is used
-     */
-    global $db_conn, $success;
-    $statement = oci_parse($db_conn, $cmdstr);
-    if (!$statement) {
-        echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-        $e = OCI_Error($db_conn);
-        echo htmlentities($e['message']);
-        $success = False;
-    }
-    // $ret = array();
-    foreach ($list as $tuple) {
-        foreach ($tuple as $bind => $val) {
-            // echo $val;
-            // echo "<br>" . $bind . "<br>";
-            oci_bind_by_name($statement, $bind, $val);
-            unset($val); //make sure you do not remove this. Otherwise $val will remain in an array object wrapper which will not be recognized by Oracle as a proper datatype
-        }
-        $r = oci_execute($statement, OCI_DEFAULT);
-        if (!$r) {
-            echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-            $e = OCI_Error($statement); // For oci_execute errors, pass the statementhandle
-            echo htmlentities($e['message']);
-            echo "<br>";
-            $success = False;
-        }
-        // array_push($ret, $statement);
-    }
-    $ret = $statement;
-    return $ret;
-}
-
-
-function connectToDB()
-{
-    global $db_conn;
-    global $config;
-    // Your username is ora_(CWL_ID) and the password is a(student number). For example,
-    // ora_platypus is the username and a12345678 is the password.
-    // $db_conn = oci_connect("ora_cwl", "a12345678", "dbhost.students.cs.ubc.ca:1522/stu");
-    $db_conn = oci_connect($config["dbuser"], $config["dbpassword"], $config["dbserver"]);
-    if ($db_conn) {
-        debugAlertMessage("Database is Connected");
-        return true;
-    } else {
-        debugAlertMessage("Cannot connect to Database");
-        $e = OCI_Error(); // For oci_connect errors pass no handle
-        echo htmlentities($e['message']);
-        return false;
-    }
-}
-
-function disconnectFromDB()
-{
-    global $db_conn;
-    debugAlertMessage("Disconnect from Database");
-    oci_close($db_conn);
-}
-
-
 function printResult($result)
 { //prints results from a select statement
     echo "<table>";
@@ -198,12 +115,10 @@ function printResult($result)
     while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
         $tuple = "<tr>";
         $header = "<tr>";
-
         foreach ($row as $key => $value) {
             if (!$headerPrinted) {
                 $header = $header . "<th>" . $key . "</th>";
             }
-
             debug_to_console($tuple);
             if ($key == "WEBSITE" && $value && $value != "null") {
                 $tuple = $tuple . "<td><a href =" . $value . " target='_blank'>Visit site</a></td>";
@@ -211,115 +126,159 @@ function printResult($result)
                 $tuple = $tuple . "<td>" . $value . "</td>";
             }
         }
-
         $tuple = $tuple . "</tr>";
-
         if (!$headerPrinted) {
             $header = $header . "</tr>";
             echo $header;
             $headerPrinted = true;
         }
-
         echo $tuple;
     }
-
     echo "</table>";
 }
 
-function sql_file_to_array($location)
+function handleRequests()
 {
-    //load file
-    $commands = file_get_contents($location);
+    if (!SQL::connectToDB()) {
+        popUp("Could not connect to database when handling request.");
+    }
+    if (isset($_POST['postAction'])) {
+        global $postReset;
+        global $postUpdate;
+        global $postInsert;
+        global $postDelete;
+        ("handle" . $_GET['postAction'] . "Request")();
+    }
+    if (isset($_GET['getAction'])) {
+        global $getCount;
+        global $getDisplay;
+        global $getQuery;
+        global $getSPJ;
+        global $getLookUp;
+        ("handle" . $_GET['getAction'] . "Request")();
+    }
+    SQL::disconnectFromDB();
+}
+?>
 
-    //delete comments
-    $lines = explode("\n", $commands);
-    $commands = '';
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line && !str_starts_with($line, '--')) {
-            $commands .= $line . "\n";
+
+<?php
+class SQL
+{
+    public static $db_conn = NULL;	// login credentials
+
+    public static function executePlainSQL($cmdstr)
+    {
+        global $db_conn, $success;
+        $statement = oci_parse($db_conn, $cmdstr);
+
+        if (!$statement) {
+            echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
+            $e = OCI_Error($db_conn); // For oci_parse errors pass the connection handle
+            echo htmlentities($e['message']);
+            $success = False;
         }
+        $r = oci_execute($statement, OCI_DEFAULT);
+        if (!$r) {
+            echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
+            $e = oci_error($statement); // For oci_execute errors pass the statementhandle
+            echo htmlentities($e['message']);
+            $success = False;
+        }
+        return $statement;
     }
 
-    //convert to array
-    $commands = explode(";", $commands);
-    return $commands;
-}
-
-function run_sql_file($location)
-{
-    global $db_conn;
-    $commands = sql_file_to_array($location);
-    //run commands
-    $total = $success = 0;
-    foreach ($commands as $command) {
-        if (trim($command)) {
-            $success += (@executePlainSQL($command) == false ? 0 : 1);
-            oci_commit($db_conn);
-            $total += 1;
+    public static function executeBoundSQL($cmdstr, $list)
+    {
+        /*
+         * Sometimes the same statement will be executed several times with different values for the variables involved in the query.
+         * In this case you don't need to create the statement several times.
+         * Bound variables cause a statement to only be parsed once and you can reuse the statement.
+         * This is also very useful in protecting against SQL injection.
+         */
+        global $db_conn, $success;
+        $statement = oci_parse($db_conn, $cmdstr);
+        if (!$statement) {
+            echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
+            $e = OCI_Error($db_conn);
+            echo htmlentities($e['message']);
+            $success = False;
         }
+        foreach ($list as $tuple) {
+            foreach ($tuple as $bind => $val) {
+                oci_bind_by_name($statement, $bind, $val);
+                unset($val); //make sure you do not remove this. Otherwise $val will remain in an array object wrapper which will not be recognized by Oracle as a proper datatype
+            }
+            $r = oci_execute($statement, OCI_DEFAULT);
+            if (!$r) {
+                echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
+                $e = OCI_Error($statement); // For oci_execute errors, pass the statementhandle
+                echo htmlentities($e['message']);
+                echo "<br>";
+                $success = False;
+            }
+        }
+        $ret = $statement;
+        return $ret;
     }
-    //return number of successful queries and total number of queries found
-    return array(
-        "success" => $success,
-        "total" => $total
-    );
-}
 
-$operators = array(
-    "=",
-    "<>",
-    ">",
-    ">=",
-    "<",
-    "<=",
-);
-function areTokensOK()
-{
-    global $pklist;
-    global $columnslist;
-    global $operators;
-
-    $_GET['inputFrom'] = strtoupper($_GET['inputFrom']);
-    trim($_GET['inputFrom']);
-    $tablesFrom = preg_split("/,/", $_GET["inputFrom"]);
-    foreach ($tablesFrom as $table) {
-        if (!in_array($table, array_keys($pklist))) {
-            popUp("Invalid table");
+    public static function connectToDB()
+    {
+        global $db_conn;
+        global $config;
+        $db_conn = oci_connect($config["dbuser"], $config["dbpassword"], $config["dbserver"]);
+        if ($db_conn) {
+            debugAlertMessage("Database is Connected");
+            return true;
+        } else {
+            debugAlertMessage("Cannot connect to Database");
+            $e = OCI_Error(); // For oci_connect errors pass no handle
+            echo htmlentities($e['message']);
             return false;
         }
     }
 
-    $_GET['inputSelect'] = strtoupper($_GET['inputSelect']);
-    $inSelectedTables = false;
-    if ($_GET['inputSelect'] != "*") {
-        foreach ($tablesFrom as $table) {
-            $column = preg_split("/\./", $_GET['inputSelect'])[1];
-            var_dump($column);
-            if (in_array($column, $columnslist[$table])) {
-                $inSelectedTables = true;
-                break;
+    public static function disconnectFromDB()
+    {
+        global $db_conn;
+        debugAlertMessage("Disconnect from Database");
+        oci_close($db_conn);
+    }
+    public static function sql_file_to_array($location)
+    {
+        $commands = file_get_contents($location);
+        function deleteComments($commands)
+        {
+            $lines = explode("\n", $commands);
+            $commands = '';
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line && !str_starts_with($line, '--')) {
+                    $commands .= $line . "\n";
+                }
             }
         }
-    }
-    if (
-        !$inSelectedTables
-        && $_GET['inputSelect'] != "*"
-    ) {
-        popUp("Invalid Column");
-        return false;
+        deleteComments($commands);
+        $commands = explode(";", $commands);
+        return $commands;
     }
 
-    // $conditionList = preg_split("/(and)|(or)/i", $_GET['inputWhere']);
-    // foreach ($conditionList as $condition) {
-    // 	$pieces = preg_split("/\s*/", $condition);
-    // 	foreach ($pieces as $piece) {
-    // 		if (!in_array($piece, $tablesFrom)
-    // 			&& !in_array($piece, $operators)) {
-    // 				return false;
-    // 		}
-    // 	}
-    // }
-    return true;
+    public static function run_sql_file($location)
+    {
+        global $db_conn;
+        $commands = SQL::sql_file_to_array($location);
+        $total = $success = 0;
+        foreach ($commands as $command) {
+            if (trim($command)) {
+                $success += (@SQL::executePlainSQL($command) == false ? 0 : 1);
+                oci_commit($db_conn);
+                $total += 1;
+            }
+        }
+        return array(
+            "success" => $success,
+            "total" => $total
+        );
+    }
 }
 ?>
