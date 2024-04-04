@@ -42,6 +42,32 @@ $operators = array(
 
 
 <?php
+
+function powerset($array) {
+    // excludes the empty set
+    $results = array();
+    for ($i = 1; $i <= count($array); $i++) {
+        $results = array_merge($results, findCombos($array, $i));
+    }
+    return $results;
+}
+function findCombos($array, $limit){
+	$subset = array();
+	$results = array(array()); 
+	foreach ($array as $element){
+		foreach ($results as $combination){
+			$result = array_merge(array($element), $combination);
+			array_push($results, $result);
+
+			if(count($result) == $limit){
+				$subset[] = $result;
+			}
+		}
+	}
+
+	return $subset;
+}
+
 function onPageLoad()
 {
     SQL::connectToDB();

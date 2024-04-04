@@ -80,6 +80,24 @@ class Query
         return $query;
     }
 
+    public static function projectColumns()
+    {
+        if (!empty($_GET["inputSelect"])) {
+            $query = " SELECT ";
+            $inputSelectCounter = "";
+            while (isset($_GET["inputSelect" . $inputSelectCounter])) {
+                $query .= " " . $_GET["inputSelect" . $inputSelectCounter];
+                $inputSelectCounter .= "_";
+                if (empty($_GET["inputSelect" . $inputSelectCounter])) {
+                    break;
+                }
+                $query .= ", ";
+            }
+            return $query;
+        }
+        return "";
+    }
+
     public static function select()
     {
         if (!empty($_GET["inputWhereCon"])) {
@@ -102,7 +120,7 @@ class Query
         if (!Query::areTokensOK()) {
             return;
         }
-        $query = "SELECT " . $_GET['inputSelect'];
+        $query = Query::projectColumns();
         $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
         if (count($selectedTables) > 1) {
             assert(count($selectedTables) == 2, "Two tables only supported for now.");
@@ -144,6 +162,7 @@ function handleCountRequest()
 
 
 <?php
+
 function handleSPJRequest()
 {
     $query = Query::project();
@@ -195,22 +214,44 @@ function handleSPJRequest()
             }
         </script>
         SELECT:
-        <select name="inputSelect">
-            <option value="*">*</option>
-            <?php
-            foreach ($columnslist as $table => $columns) {
-                foreach ($columns as $column) {
-                    $class1 = "selectOption" . $table;
-                    $class2 = "selectOption";
-                    echo "<option " .
-                        "style=\"display:none\" " .
-                        "class=\"" . $class1 . " " . $class2 . "\" " .
-                        "value=\"" . $table . "." . $column . "\"" .
-                        ">" . $table . "." . $column . "</option>";
+        <span> <select name="inputSelect" onChange="changeSelect(this)">
+                <option value=""></option>
+                <option value="*">*</option>
+                <?php
+                foreach ($columnslist as $table => $columns) {
+                    foreach ($columns as $column) {
+                        $class1 = "selectOption" . $table;
+                        $class2 = "selectOption";
+                        echo "<option " .
+                            "style=\"display:none\" " .
+                            "class=\"" . $class1 . " " . $class2 . "\" " .
+                            "value=\"" . $table . "." . $column . "\"" .
+                            ">" . $table . "." . $column . "</option>";
+                    }
+                }
+                ?>
+            </select><br /><br /></span>
+        <script>
+            var inputSelectCounter = "_";
+            function changeSelect(menu) {
+                if (menu.value == "") {
+                    let divElements = menu.parentElement.getElementsByTagName("span");
+                    if (divElements.length == 0) {
+                        return;
+                    }
+                    divElements[0].remove();
+                } else {
+                    if (menu.parentElement.getElementsByTagName("span").length != 0) {
+                        return;
+                    }
+                    menu2 = menu.parentElement.cloneNode(true);
+                    for (const child of menu2.children) {
+                        child.setAttribute("name", child.getAttribute("name") + inputSelectCounter);
+                    }
+                    menu.parentElement.appendChild(menu2);
                 }
             }
-            ?>
-        </select><br /><br />
+        </script>
         WHERE:
         <span><select name="inputWhereVal1">
                 <?php
@@ -252,7 +293,7 @@ function handleSPJRequest()
                     }
                     divElements[0].remove();
                 } else {
-                    if (menu.parentElement.getElementsByTagName("div").length != 0) {
+                    if (menu.parentElement.getElementsByTagName("span").length != 0) {
                         return;
                     }
                     menu2 = menu.parentElement.cloneNode(true);
