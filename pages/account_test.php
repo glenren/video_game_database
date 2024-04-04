@@ -40,7 +40,7 @@ login($creds);
 
 
 		<?php
-		function handleLookUpRequest()
+		function handleSearchRequest()
 		{
 			global $db_conn;
 
