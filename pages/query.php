@@ -181,6 +181,12 @@ function handleSPJRequest()
 
 <h3>SELECT PROJECT JOIN Query</h3>
 <div class="outer">
+    <p>
+        Search for any attributes in the database.
+        Can join two tables together and filter.
+        The * value in SELECT chooses all columns.
+        If there is one condition, and it does not have a value to compare against, the WHERE clause does not run.
+    </p>
     <form method="GET" action="index.php">
         FROM:
         <select name="inputFrom" onChange="switchSelect(this);">
@@ -335,67 +341,6 @@ function handleDivideRequest()
 <p>Finds all accounts that owns all games.</p>
     <form method="GET" action="index.php">
         <p><input type="submit" name="getAction" value="<?php echo $getDivide?>"></p>
-    </form>
-</div>
-
-
-
-
-<?php
-function handleQueryRequest()
-{
-    // Sanitize table and column names
-    if (!Query::areTokensOK()) {
-        return;
-    }
-    $query = "SELECT " . $_GET['inputSelect'] . " FROM " . $_GET['inputFrom'];
-    if (!empty($_GET['inputWhere'])) {
-        $query .= " WHERE (" . $_GET['inputWhere'] . ")";
-    }
-    if (!empty($_GET['inputGroupBy'])) {
-        $query .= " GROUP BY (" . $_GET['inputGroupBy'] . ")";
-    }
-    if (!empty($_GET['inputHaving'])) {
-        $query .= " HAVING (" . $_GET['inputHaving'] . ")";
-    }
-    $results = SQL::executePlainSQL($query);
-    global $success;
-    if ($success) {
-        //popUp("Success");
-        printResult($results);
-    } else {
-        popUp("Database Error");
-    }
-}
-?>
-<h3>General Query</h3>
-<div class="outer">
-    <form method="GET" action="index.php">
-        FROM:
-        <select name="inputFrom">
-            <?php
-            $temp = $pklist;
-            foreach ($pklist as $table => $columns) {
-                unset($temp[$table]);
-                foreach ($temp as $table2 => $columns2) {
-                    if (empty(array_intersect($columns, $columns2))) {
-                        continue;
-                    }
-                    $joinOption = $table . "," . $table2;
-                    echo "<option value=\"" . $joinOption . "\">" . $joinOption . "</option>";
-                }
-            }
-            ?>
-        </select><br /><br />
-        SELECT Column: <input type="text" name="inputSelect">
-        <br /><br />
-        WHERE Column: <input type="text" name="inputWhere">
-        <br /><br />
-        GROUP BY: <input type="text" name="inputGroupBy">
-        <br /><br />
-        HAVING: <input type="text" name="inputHaving">
-        <br /><br />
-        <input type="submit" name="getAction" value="<?= $getQuery ?>"></p>
     </form>
 </div>
 

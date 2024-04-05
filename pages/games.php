@@ -57,8 +57,7 @@ function handleViewRequest() {
 
 <?php
 function handleFilterRequest() {
-    $command;
-
+    $command = "";
     if (!$_GET['min']) {
         $command = "SELECT g.Name, g.DevTeamName, COUNT(DISTINCT r.ReviewID) AS Number_of_Reviews, "
             . "AVG(r.Rating) AS AVG_Rating FROM MakesReviewReviewing1 r, VideoGameMadeBy g WHERE "
