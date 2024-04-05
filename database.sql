@@ -19,7 +19,6 @@ DROP TABLE Account CASCADE CONSTRAINTS;
 DROP TABLE Adds CASCADE CONSTRAINTS;
 DROP TABLE MakesReviewReviewing2 CASCADE CONSTRAINTS;
 DROP TABLE MakesReviewReviewing1 CASCADE CONSTRAINTS;
---DROP TABLE MakesReviewReviewing3 CASCADE CONSTRAINTS;
 --
 -- Now, add each table.
 --
@@ -141,12 +140,6 @@ CREATE TABLE MakesReviewReviewing1 (
 	FOREIGN KEY (Username) REFERENCES Account,
 	FOREIGN KEY (GID) REFERENCES VideoGameMadeBy ON DELETE CASCADE
 );
---CREATE TABLE MakesReviewReviewing3 (
---	ReviewID INT,
---	Category VARCHAR(128),
---	PRIMARY KEY (ReviewID),
---	FOREIGN KEY (ReviewID) REFERENCES MakesReviewReviewing1 ON DELETE CASCADE
---);
 -- done adding all of the tables, now add in some tuples
 -- Dev
 INSERT INTO Dev(DevName, Website)
@@ -672,14 +665,3 @@ VALUES (
 		'mobius',
 		'101945'
 	);
--- MakesReviewReviewing3
---INSERT INTO MakesReviewReviewing3(ReviewID, Category)
---VALUES ('2341', 'Medium');
---INSERT INTO MakesReviewReviewing3(ReviewID, Category)
---VALUES ('1234', 'Medium');
---INSERT INTO MakesReviewReviewing3(ReviewID, Category)
---VALUES ('5756', 'Short');
---INSERT INTO MakesReviewReviewing3(ReviewID, Category)
---VALUES ('1304', 'Long');
---INSERT INTO MakesReviewReviewing3(ReviewID, Category)
---VALUES ('8765', 'Medium');
