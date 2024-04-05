@@ -167,11 +167,11 @@ Mininum # of Reviews (leave blank to view all): <input type="number" name="min" 
             echo "Username : <input type=\"text\" name=\"username\"><br />";
 
             echo "<p>Rating:</p><br/>";
-            echo "<label class=\"rating\">1<br/><input type=\"radio\" id=\"1\" name=\"rating\" value=1></label>";
-            echo "<label class=\"rating\">2<br/><input type=\"radio\" id=\"2\" name=\"rating\" value=2></label>";
-            echo "<label class=\"rating\">3<br/><input type=\"radio\" id=\"3\" name=\"rating\" value=3></label>";
-            echo "<label class=\"rating\">4<br/><input type=\"radio\" id=\"4\" name=\"rating\" value=4></label>";
-            echo "<label class=\"rating\">5<br/><input type=\"radio\" id=\"5\" name=\"rating\" value=5></label>";
+            echo "<label class=\"rating\"><input type=\"radio\" id=\"1\" name=\"rating\" value=1>1</label><br/>";
+            echo "<label class=\"rating\"><input type=\"radio\" id=\"2\" name=\"rating\" value=2>2</label><br/>";
+            echo "<label class=\"rating\"><input type=\"radio\" id=\"3\" name=\"rating\" value=3>3</label><br/>";
+            echo "<label class=\"rating\"><input type=\"radio\" id=\"4\" name=\"rating\" value=4>4</label><br/>";
+            echo "<label class=\"rating\"><input type=\"radio\" id=\"5\" name=\"rating\" value=5>5</label><br/>";
 
             echo "<br/><br/><br/><input type=\"submit\" name=\"postAction\" value=\"Review\"></form></div>";
         }
