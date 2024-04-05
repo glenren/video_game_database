@@ -51,8 +51,38 @@ function handleViewRequest() {
 <h3>View All Games</h3>
 <div class="outer">
     <form method="GET" action="games.php">
-        <input type="submit" name="getAction" value="View"></p>
+        <input type="submit" name="getAction" value="View">
     </form>
+</div>
+
+<?php
+function handleFilterRequest() {
+    $command;
+
+    if (!$_GET['min']) {
+        $command = "SELECT g.Name, g.DevTeamName, COUNT(DISTINCT r.ReviewID) AS Number_of_Reviews, "
+            . "AVG(r.Rating) AS AVG_Rating FROM MakesReviewReviewing1 r, VideoGameMadeBy g WHERE "
+            . "g.GID = r.GID GROUP BY g.GID, g.Name, g.DevTeamName ORDER BY COUNT(DISTINCT r.ReviewID) DESC";
+    } else {
+        $command = "SELECT g.Name, g.DevTeamName, COUNT(DISTINCT r.ReviewID) AS Number_of_Reviews, "
+            . "AVG(r.Rating) AS AVG_Rating FROM MakesReviewReviewing1 r, VideoGameMadeBy g WHERE "
+            . "g.GID = r.GID GROUP BY g.GID, g.Name, g.DevTeamName HAVING COUNT(DISTINCT r.ReviewID) > '" . $_GET['min']
+            . "' ORDER BY COUNT(DISTINCT r.ReviewID) DESC";
+    }
+
+    $result = SQL::executePlainSQL($command);
+    oci_commit(SQL::$db_conn);
+    echo "<h2>Games by Review Count:</h2>";
+    printResult($result);
+}
+?>
+
+<h3>Filter Games by Review Count</h3>
+<div class="outer">
+<form method="GET" action="games.php">
+Mininum # of Reviews (leave blank to view all): <input type="number" name="min" value="Filter">
+<p><input type="submit" name="getAction" value="Filter"></p>
+</form>
 </div>
 
 
