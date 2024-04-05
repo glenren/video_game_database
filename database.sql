@@ -19,7 +19,7 @@ DROP TABLE Account CASCADE CONSTRAINTS;
 DROP TABLE Adds CASCADE CONSTRAINTS;
 DROP TABLE MakesReviewReviewing2 CASCADE CONSTRAINTS;
 DROP TABLE MakesReviewReviewing1 CASCADE CONSTRAINTS;
-DROP TABLE MakesReviewReviewing3 CASCADE CONSTRAINTS;
+--DROP TABLE MakesReviewReviewing3 CASCADE CONSTRAINTS;
 --
 -- Now, add each table.
 --
@@ -141,12 +141,12 @@ CREATE TABLE MakesReviewReviewing1 (
 	FOREIGN KEY (Username) REFERENCES Account,
 	FOREIGN KEY (GID) REFERENCES VideoGameMadeBy ON DELETE CASCADE
 );
-CREATE TABLE MakesReviewReviewing3 (
-	ReviewID INT,
-	Category VARCHAR(128),
-	PRIMARY KEY (ReviewID),
-	FOREIGN KEY (ReviewID) REFERENCES MakesReviewReviewing1 ON DELETE CASCADE
-);
+--CREATE TABLE MakesReviewReviewing3 (
+--	ReviewID INT,
+--	Category VARCHAR(128),
+--	PRIMARY KEY (ReviewID),
+--	FOREIGN KEY (ReviewID) REFERENCES MakesReviewReviewing1 ON DELETE CASCADE
+--);
 -- done adding all of the tables, now add in some tuples
 -- Dev
 INSERT INTO Dev(DevName, Website)
@@ -580,6 +580,8 @@ INSERT INTO Adds(Username, GID, Status)
 VALUES ('mobius', '1778820', 'backlog');
 -- MakesReviewReviewing2
 INSERT INTO MakesReviewReviewing2(Category, Length)
+VALUES ('Short', '0');
+INSERT INTO MakesReviewReviewing2(Category, Length)
 VALUES ('Medium', '300');
 INSERT INTO MakesReviewReviewing2(Category, Length)
 VALUES ('Medium', '200');
@@ -601,7 +603,7 @@ INSERT INTO MakesReviewReviewing1(
 VALUES (
 		'2341',
 		TO_DATE('2023-02-18', 'yyyy/mm/dd'),
-		'5',
+		'2',
 		'300',
 		'dkos',
 		'216878'
@@ -617,7 +619,7 @@ INSERT INTO MakesReviewReviewing1(
 VALUES (
 		'1234',
 		TO_DATE('2023-09-05', 'yyyy/mm/dd'),
-		'7',
+		'4',
 		'200',
 		'popcornman',
 		'1382330'
@@ -633,7 +635,7 @@ INSERT INTO MakesReviewReviewing1(
 VALUES (
 		'5756',
 		TO_DATE('2019-05-27', 'yyyy/mm/dd'),
-		'9',
+		'5',
 		'50',
 		'dreamindream',
 		'257510'
@@ -649,7 +651,7 @@ INSERT INTO MakesReviewReviewing1(
 VALUES (
 		'1304',
 		TO_DATE('2020-08-13', 'yyyy/mm/dd'),
-		'8',
+		'4',
 		'1000',
 		'heronboy',
 		'1778820'
@@ -665,19 +667,19 @@ INSERT INTO MakesReviewReviewing1(
 VALUES (
 		'8765',
 		TO_DATE('2021-10-14', 'yyyy/mm/dd'),
-		'10',
+		'5',
 		'400',
 		'mobius',
 		'101945'
 	);
 -- MakesReviewReviewing3
-INSERT INTO MakesReviewReviewing3(ReviewID, Category)
-VALUES ('2341', 'Medium');
-INSERT INTO MakesReviewReviewing3(ReviewID, Category)
-VALUES ('1234', 'Medium');
-INSERT INTO MakesReviewReviewing3(ReviewID, Category)
-VALUES ('5756', 'Short');
-INSERT INTO MakesReviewReviewing3(ReviewID, Category)
-VALUES ('1304', 'Long');
-INSERT INTO MakesReviewReviewing3(ReviewID, Category)
-VALUES ('8765', 'Medium');
+--INSERT INTO MakesReviewReviewing3(ReviewID, Category)
+--VALUES ('2341', 'Medium');
+--INSERT INTO MakesReviewReviewing3(ReviewID, Category)
+--VALUES ('1234', 'Medium');
+--INSERT INTO MakesReviewReviewing3(ReviewID, Category)
+--VALUES ('5756', 'Short');
+--INSERT INTO MakesReviewReviewing3(ReviewID, Category)
+--VALUES ('1304', 'Long');
+--INSERT INTO MakesReviewReviewing3(ReviewID, Category)
+--VALUES ('8765', 'Medium');

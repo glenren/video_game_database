@@ -59,7 +59,7 @@ function handleViewRequest() {
 		<?php
 		function handleGameRequest() {
 		    if (!$_GET['gameName']) {
-        		popUp("Please enter a username!");
+        		popUp("Please enter a game name!");
         		return;
         	}
 
@@ -127,6 +127,47 @@ function handleViewRequest() {
             oci_commit(SQL::$db_conn);
             echo "<h2>Ratings for <i><u>" . $Name . "</u></i>:</h2>";
             printResult($result);
+
+            echo "<h3>Leave a review for " . $Name . "?</h3>";
+            echo "<div class=\"outer\"><form method=\"POST\" action=\"games.php\" id=\"review\">";
+            echo "<input type=\"hidden\" name=\"GID\" value=" . $GID . ">";
+            echo "<input type=\"hidden\" name=\"reviewDate\" value=" . strtoupper(date("d-M-y")) . ">";
+            echo "<input type=\"hidden\" name=\"length\" value=\"0\">";
+            echo "<input type=\"hidden\" name=\"category\" value=\"Short\">";
+            echo "Username : <input type=\"text\" name=\"username\"><br />";
+
+            echo "<p>Rating:</p><br/>";
+            echo "<label class=\"rating\">1<br/><input type=\"radio\" id=\"1\" name=\"rating\" value=1></label>";
+            echo "<label class=\"rating\">2<br/><input type=\"radio\" id=\"2\" name=\"rating\" value=2></label>";
+            echo "<label class=\"rating\">3<br/><input type=\"radio\" id=\"3\" name=\"rating\" value=3></label>";
+            echo "<label class=\"rating\">4<br/><input type=\"radio\" id=\"4\" name=\"rating\" value=4></label>";
+            echo "<label class=\"rating\">5<br/><input type=\"radio\" id=\"5\" name=\"rating\" value=5></label>";
+
+            echo "<br/><br/><br/><input type=\"submit\" name=\"postAction\" value=\"Review\"></form></div>";
+        }
+
+        function handleReviewRequest() {
+            $mrr1 = array(
+                ":bind1" => rand(),
+                ":bind2" => $_POST['reviewDate'],
+                ":bind3" => $_POST['rating'],
+                ":bind4" => $_POST['length'],
+                ":bind5" => $_POST['username'],
+                ":bind6" => $_POST['GID']
+            );
+
+            $mrr1 = array($mrr1);
+
+            SQL::executeBoundSQL("INSERT INTO MakesReviewReviewing1 VALUES (:bind1, :bind2, :bind3, :bind4, :bind5, :bind6)", $mrr1);
+
+            global $success;
+
+            if ($success && oci_commit(SQL::$db_conn)) {
+                popUp("Successfully added review!");
+            } else {
+                popUp("Error: your review could not be added,"
+                    . " please check that the inputted username is registered in our system.");
+            }
         }
 
 		?>
@@ -138,7 +179,25 @@ function handleViewRequest() {
 			</form>
 		</div>
 
-		<?php
+<?php
+/*
+function handleViewRequest() {
+    $command = "SELECT * FROM VideoGameMadeBy";
+
+    $result = SQL::executePlainSQL($command);
+    oci_commit(SQL::$db_conn);
+    printResult($result);
+}
+?>
+
+<h3>Rate a Game</h3>
+<div class="outer">
+    <form method="GET" action="games.php">
+        <input type="submit" name="getAction" value="View"></p>
+    </form>
+</div>
+<?php
+*/
 		handleRequests();
 		?>
 	</div>

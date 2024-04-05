@@ -115,6 +115,13 @@ tr:nth-of-type(even) {
         margin-left: 5px;
     }
 
+    label.rating {
+        float: left;
+        padding-left: 5px;
+        padding-right: 5px;
+        text-align: center;
+    }
+
     input[type=submit] {
         background-color: #2fbac4;
         border: 0px solid white;
