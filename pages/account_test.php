@@ -32,7 +32,7 @@ login($creds);
 			<li><a href="../index.php">Home</a></li>
 			<li><a href="games.php">Games</a></li>
 			<li><a class="active" href="account_test.php">Users</a></li>
-			<li><a href="#about">Dev Teams</a></li>
+			<li><a href="devteam.php">Dev Teams</a></li>
 		</ul>
 	</div>
 	<div class="main">

@@ -38,7 +38,7 @@ require ("pages/library.php");
             <li><a class="active" href="index.php">Home</a></li>
             <li><a href="pages/games.php">Games</a></li>
             <li><a href="pages/account_test.php">Users</a></li>
-            <li><a href="#about">Dev Teams</a></li>
+            <li><a href="pages/devteam.php">Dev Teams</a></li>
         </ul>
     </div>
 
