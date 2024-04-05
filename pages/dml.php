@@ -39,12 +39,40 @@ function handleInsertRequest()
 
 
 <?php
-function handleDeleteRequest()
-{
-    //getting value from user and delete data from table
-	$name = $_POST['gameTitle'];
 
-	SQL::executePlainSQL("DELETE FROM VideoGameMadeBy WHERE Name LIKE'" . $name . "' collate binary_ci");
+function handleDeleteRequest() {
+    if (!$_POST['gameTitle']) {
+        popUp("Please enter a game name!");
+        return;
+    }
+
+    $command = "SELECT * FROM VideoGameMadeBy WHERE Name LIKE '" . $_POST['gameTitle'] . "'  collate binary_ci";
+
+    $result = SQL::executePlainSQL($command);
+    oci_commit(SQL::$db_conn);
+
+    $index = 0;
+    $log = array();
+    while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
+        $date = date_parse($row["RELEASEDATE"]);
+        $row["RELEASEDATE"] = $date["year"];
+        $log[$index] = $row;
+        $index += 1;
+    }
+
+    if ($index == 0) {
+        popUP("No game with such a name was found in the database.");
+        return;
+    }
+
+    if ($index > 1) {
+        dupeGames($log);
+        return;
+    }
+
+    $command = "DELETE FROM VideoGameMadeBy WHERE GID = '" . $log[0]["GID"] . "'";
+
+    $result = SQL::executePlainSQL($command);
 
     if (oci_commit(SQL::$db_conn)) {
         popUp("Successfully deleted video game!");
@@ -52,6 +80,40 @@ function handleDeleteRequest()
         popUp("Couldn't add video game!");
     }
 }
+
+function dupeGames($log) {
+    echo "<h3>Did You Mean:</h3><div class=\"outer\">";
+    echo "<form method=\"POST\" action=\"index.php\">";
+
+    foreach ($log as $row) {
+        echo "<input type=\"radio\" id=\"". $row["GID"] . "\" name=\"dupeID\" value=\""
+            . $row["GID"] . "\">";
+        echo "<label for=\"" . $row["GID"] . "\">" . $row["NAME"]
+            . " (" . $row["RELEASEDATE"] . ") by "
+            . $row["DEVTEAMNAME"] . "</label></br></br>";
+    }
+
+    echo "</br><input type=\"submit\" name=\"postAction\" value=\"Submit\"></p></form></div>";
+
+}
+
+function handleSubmitRequest() {
+    if (!$_POST['dupeID']) {
+        popUp("Please select a game!");
+        return;
+    }
+
+    $command = "DELETE FROM VideoGameMadeBy WHERE GID = '" . $_POST['dupeID'] . "'";
+
+    $result = SQL::executePlainSQL($command);
+
+    if (oci_commit(SQL::$db_conn)) {
+        popUp("Successfully deleted video game!");
+    } else {
+        popUp("Couldn't add video game!");
+    }
+}
+
 ?>
 <h3> Delete Video Game</h3>
 <div class="outer"><form method="POST" action="index.php">
