@@ -111,7 +111,7 @@ tr:nth-of-type(even) {
         padding-top: 10px;
     }
 
-    input[type=text], select {
+    input[type=text], input[type=date], select {
         margin-left: 5px;
     }
 

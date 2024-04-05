@@ -30,7 +30,7 @@ login($creds);
 			<li class="spacer">|</li>
 			<li class="text">VIDEO GAME DATABASE</li>
 			<li><a href="../index.php">Home</a></li>
-			<li><a href="#news">Games</a></li>
+			<li><a href="games.php">Games</a></li>
 			<li><a class="active" href="account_test.php">Users</a></li>
 			<li><a href="#about">Dev Teams</a></li>
 		</ul>

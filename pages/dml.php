@@ -5,7 +5,7 @@ function handleInsertRequest()
     $tuple = array(
         ":bind1" => rand(),
         ":bind2" => $_POST['gameTitle'],
-        ":bind3" => $_POST['releaseDate'], //has to be in form dd-MMMM-yyyy
+        ":bind3" => strtoupper(date('d-M-y', strtotime($_POST['releaseDate']))), //has to be in form dd-MMMM-yyyy
         ":bind4" => $_POST['price'],
         ":bind5" => $_POST['category'],
         ":bind6" => $_POST['devteamName'] //case sensitive
@@ -27,10 +27,9 @@ function handleInsertRequest()
 }
 ?>
 <h3>Add Video Game</h3>
-<form method="POST" action="index.php">
 <div class="outer"><form method="POST" action="index.php">
     Video Game Title: <input type="text" name="gameTitle"> <br /><br />
-    Release Date: <input type="text" name="releaseDate"> <br /><br />
+    Release Date: <input type="date" name="releaseDate"> <br /><br />
     Price: <input type="text" name="price"> <br /><br />
     Category: <input type="text" name="category"> <br /><br />
     Development Team: <input type="text" name="devteamName"> <br /><br />

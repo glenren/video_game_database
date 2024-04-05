@@ -279,7 +279,7 @@ function handleSPJRequest()
                 }
                 ?>
             </select>
-            <input name="inputWhereVal2">
+            <input type="text" name="inputWhereVal2">
             <select name="inputWhereCon" onChange="changeWhere(this)">
                 <option value=""></option>
                 <option value="AND">AND</option>
@@ -331,10 +331,10 @@ function handleDivideRequest()
 ?>
 
 <h3>Divide Query</h3>
-<p>Finds all accounts that owns all games.</p>
 <div class="outer">
+<p>Finds all accounts that owns all games.</p>
     <form method="GET" action="index.php">
-        <input type="submit" name="getAction" value="<?php echo $getDivide?>"></p>
+        <p><input type="submit" name="getAction" value="<?php echo $getDivide?>"></p>
     </form>
 </div>
 

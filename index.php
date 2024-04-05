@@ -36,7 +36,7 @@ require ("pages/library.php");
             <li class="spacer">|</li>
             <li class="text">VIDEO GAME DATABASE</li>
             <li><a class="active" href="index.php">Home</a></li>
-            <li><a href="#news">Games</a></li>
+            <li><a href="pages/games.php">Games</a></li>
             <li><a href="pages/account_test.php">Users</a></li>
             <li><a href="#about">Dev Teams</a></li>
         </ul>
