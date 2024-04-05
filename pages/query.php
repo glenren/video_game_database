@@ -23,7 +23,6 @@ class Query
         if ($_GET['inputSelect'] != "*") {
             foreach ($tablesFrom as $table) {
                 $column = preg_split("/\./", $_GET['inputSelect'])[1];
-                var_dump($column);
                 if (in_array($column, $columnslist[$table])) {
                     $inSelectedTables = true;
                     break;
@@ -82,7 +81,18 @@ class Query
         return $condition;
     }
 
-    public static function project()
+    public static function projectTwoTables() {
+        if (!Query::areTokensOK()) {
+            return;
+        }
+        $query = Query::projectColumns();
+        $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
+        assert(count($selectedTables) == 2, "Two tables only supported for now.");
+        $query .= Query::joinTwoTables($selectedTables);
+        return $query;
+    }
+
+    public static function projectOneTable()
     {
         // Sanitize table and column names
         if (!Query::areTokensOK()) {
@@ -90,13 +100,7 @@ class Query
         }
         $query = Query::projectColumns();
         $selectedTables = preg_split("/,/", $_GET["inputFrom"]);
-        if (count($selectedTables) > 1) {
-            assert(count($selectedTables) == 2, "Two tables only supported for now.");
-            $query .= Query::joinTwoTables($selectedTables);
-        } else {
-            $query .= " FROM " . $selectedTables[0];
-        }
-
+        $query .= " FROM " . $selectedTables[0];
         return $query;
     }
 
@@ -163,9 +167,9 @@ function handleCountRequest()
 
 
 <?php
-function handleSPJRequest()
+function handleProjectRequest()
 {
-    $query = Query::project();
+    $query = Query::projectOneTable();
     $query .= Query::select();
     $results = SQL::executePlainSQL($query);
 
@@ -179,7 +183,244 @@ function handleSPJRequest()
 }
 ?>
 
-<h3>SELECT PROJECT JOIN Query</h3>
+<h3>PROJECT Query</h3>
+<div class="outer">
+    <p>
+        Search for any attributes in the database.
+        The * value in SELECT chooses all columns.
+    </p>
+    <form method="GET" action="index.php">
+        FROM:
+        <select name="inputFrom" onChange="switchSelect(this);">
+            <?php
+            foreach ($pklist as $table => $columns) {
+                echo "<option value=\"" . $table . "\">" . $table . "</option>";
+            }
+            ?>
+        </select><br /><br />
+        <script>
+            function switchSelect(htmlFrom) {
+                elements = document.getElementsByClassName("selectOption");
+                for (let option of elements) {
+                    option.style.display = "none";
+                }
+                let tables = htmlFrom.value.split(",");
+                tables.forEach(table => {
+                    elements = document.getElementsByClassName("selectOption" + table);
+                    for (let option of elements) {
+                        option.style.display = "block";
+                    }
+                });
+            }
+        </script>
+        SELECT:
+        <span> <select name="inputSelect" onChange="changeSelect(this)">
+                <option value=""></option>
+                <option value="*">*</option>
+                <?php
+                foreach ($columnslist as $table => $columns) {
+                    foreach ($columns as $column) {
+                        $class1 = "selectOption" . $table;
+                        $class2 = "selectOption";
+                        echo "<option " .
+                            "style=\"display:none\" " .
+                            "class=\"" . $class1 . " " . $class2 . "\" " .
+                            "value=\"" . $table . "." . $column . "\"" .
+                            ">" . $table . "." . $column . "</option>";
+                    }
+                }
+                ?>
+            </select><br /><br /></span>
+        <script>
+            var inputSelectCounter1 = "_";
+            function changeSelect(menu) {
+                if (menu.value == "") {
+                    let divElements = menu.parentElement.getElementsByTagName("span");
+                    if (divElements.length == 0) {
+                        return;
+                    }
+                    divElements[0].remove();
+                } else {
+                    if (menu.parentElement.getElementsByTagName("span").length != 0) {
+                        return;
+                    }
+                    menu2 = menu.parentElement.cloneNode(true);
+                    for (const child of menu2.children) {
+                        child.setAttribute("name", child.getAttribute("name") + inputSelectCounter1);
+                    }
+                    menu.parentElement.appendChild(menu2);
+                }
+            }
+        </script>
+        <input type="submit" name="getAction" value="<?= $getProject ?>"></p>
+    </form>
+</div>
+
+
+
+<?php
+function handleSelectRequest()
+{
+    $query = Query::projectOneTable();
+    $query .= Query::select();
+    $results = SQL::executePlainSQL($query);
+
+    global $success;
+    if ($success) {
+        // popUp("Success");
+        printResult($results);
+    } else {
+        popUp("Database Error");
+    }
+}
+?>
+
+<h3>SELECT Query</h3>
+<div class="outer">
+    <p>
+        Search for any attributes in the database.
+        The * value in SELECT chooses all columns.
+        If there is one condition, and it does not have a value to compare against, the WHERE clause does not run.
+    </p>
+    <form method="GET" action="index.php">
+        FROM:
+        <select name="inputFrom" onChange="switchSelect(this);">
+            <?php
+            foreach ($pklist as $table => $columns) {
+                echo "<option value=\"" . $table . "\">" . $table . "</option>";
+            }
+            ?>
+        </select><br /><br />
+        <script>
+            function switchSelect(htmlFrom) {
+                elements = document.getElementsByClassName("selectOption");
+                for (let option of elements) {
+                    option.style.display = "none";
+                }
+                let tables = htmlFrom.value.split(",");
+                tables.forEach(table => {
+                    elements = document.getElementsByClassName("selectOption" + table);
+                    for (let option of elements) {
+                        option.style.display = "block";
+                    }
+                });
+            }
+        </script>
+        SELECT:
+        <span> <select name="inputSelect" onChange="changeSelect(this)">
+                <option value=""></option>
+                <option value="*">*</option>
+                <?php
+                foreach ($columnslist as $table => $columns) {
+                    foreach ($columns as $column) {
+                        $class1 = "selectOption" . $table;
+                        $class2 = "selectOption";
+                        echo "<option " .
+                            "style=\"display:none\" " .
+                            "class=\"" . $class1 . " " . $class2 . "\" " .
+                            "value=\"" . $table . "." . $column . "\"" .
+                            ">" . $table . "." . $column . "</option>";
+                    }
+                }
+                ?>
+            </select><br /><br /></span>
+        <script>
+            var inputSelectCounter2 = "_";
+            function changeSelect(menu) {
+                if (menu.value == "") {
+                    let divElements = menu.parentElement.getElementsByTagName("span");
+                    if (divElements.length == 0) {
+                        return;
+                    }
+                    divElements[0].remove();
+                } else {
+                    if (menu.parentElement.getElementsByTagName("span").length != 0) {
+                        return;
+                    }
+                    menu2 = menu.parentElement.cloneNode(true);
+                    for (const child of menu2.children) {
+                        child.setAttribute("name", child.getAttribute("name") + inputSelectCounter2);
+                    }
+                    menu.parentElement.appendChild(menu2);
+                }
+            }
+        </script>
+        WHERE:
+        <span><select name="inputWhereVal1">
+                <?php
+                foreach ($columnslist as $table => $columns) {
+                    foreach ($columns as $column) {
+                        $class1 = "selectOption" . $table;
+                        $class2 = "selectOption";
+                        echo "<option " .
+                            "style=\"display:none\" " .
+                            "class=\"" . $class1 . " " . $class2 . "\" " .
+                            "value=\"" . $table . "." . $column . "\"" .
+                            ">" . $table . "." . $column . "</option>";
+                    }
+                }
+                ?>
+            </select>
+            <select name="inputWhereOp">
+                <?php
+                foreach ($operators as $operator) {
+                    echo "<option " .
+                        "value=\"" . $operator . "\"" .
+                        ">" . $operator . "</option>";
+                }
+                ?>
+            </select>
+            <input type="text" name="inputWhereVal2">
+            <select name="inputWhereCon" onChange="changeWhere(this)">
+                <option value=""></option>
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+            </select><br /><br /></span>
+        <script>
+            var inputWhereConCounter1 = "_";
+            function changeWhere(menu) {
+                if (menu.value == "") {
+                    let divElements = menu.parentElement.getElementsByTagName("span");
+                    if (divElements.length == 0) {
+                        return;
+                    }
+                    divElements[0].remove();
+                } else {
+                    if (menu.parentElement.getElementsByTagName("span").length != 0) {
+                        return;
+                    }
+                    menu2 = menu.parentElement.cloneNode(true);
+                    for (const child of menu2.children) {
+                        child.setAttribute("name", child.getAttribute("name") + inputWhereConCounter1);
+                    }
+                    menu.parentElement.appendChild(menu2);
+                }
+            }
+        </script>
+        <input type="submit" name="getAction" value="<?= $getSelect ?>"></p>
+    </form>
+</div>
+
+
+
+<?php
+function handleJoinRequest()
+{
+    $query = Query::projectTwoTables();
+    $query .= Query::select();
+    $results = SQL::executePlainSQL($query);
+
+    global $success;
+    if ($success) {
+        // popUp("Success");
+        printResult($results);
+    } else {
+        popUp("Database Error");
+    }
+}
+?>
+
+<h3>JOIN Query</h3>
 <div class="outer">
     <p>
         Search for any attributes in the database.
@@ -194,7 +435,6 @@ function handleSPJRequest()
             
             $temp = $pklist;
             foreach ($pklist as $table => $columns) {
-                echo "<option value=\"" . $table . "\">" . $table . "</option>";
                 unset($temp[$table]);
                 foreach ($temp as $table2 => $columns2) {
                     if (empty(array_intersect($columns, $columns2))) {
@@ -240,7 +480,7 @@ function handleSPJRequest()
                 ?>
             </select><br /><br /></span>
         <script>
-            var inputSelectCounter = "_";
+            var inputSelectCounter3 = "_";
             function changeSelect(menu) {
                 if (menu.value == "") {
                     let divElements = menu.parentElement.getElementsByTagName("span");
@@ -254,7 +494,7 @@ function handleSPJRequest()
                     }
                     menu2 = menu.parentElement.cloneNode(true);
                     for (const child of menu2.children) {
-                        child.setAttribute("name", child.getAttribute("name") + inputSelectCounter);
+                        child.setAttribute("name", child.getAttribute("name") + inputSelectCounter3);
                     }
                     menu.parentElement.appendChild(menu2);
                 }
@@ -292,7 +532,7 @@ function handleSPJRequest()
                 <option value="OR">OR</option>
             </select><br /><br /></span>
         <script>
-            var inputWhereConCounter = "_";
+            var inputWhereConCounter2 = "_";
             function changeWhere(menu) {
                 if (menu.value == "") {
                     let divElements = menu.parentElement.getElementsByTagName("span");
@@ -306,7 +546,7 @@ function handleSPJRequest()
                     }
                     menu2 = menu.parentElement.cloneNode(true);
                     for (const child of menu2.children) {
-                        child.setAttribute("name", child.getAttribute("name") + inputWhereConCounter);
+                        child.setAttribute("name", child.getAttribute("name") + inputWhereConCounter2);
                     }
                     menu.parentElement.appendChild(menu2);
                 }

@@ -26,7 +26,9 @@ $getDisplay = 'display';
 $getLookUp = 'Search';
 $getGame = 'Game';
 $getGameDupes = 'GameDupes';
-$getSPJ = 'SPJ';
+$getSPJ = 'Join';
+$getSelect = 'Select';
+$getProject = 'Project';
 $getQuery = 'query';
 $postDelete = 'delete';
 $getDivide = 'divide';
@@ -45,32 +47,6 @@ $operators = array(
 
 
 <?php
-
-function powerset($array) {
-    // excludes the empty set
-    $results = array();
-    for ($i = 1; $i <= count($array); $i++) {
-        $results = array_merge($results, findCombos($array, $i));
-    }
-    return $results;
-}
-function findCombos($array, $limit){
-	$subset = array();
-	$results = array(array()); 
-	foreach ($array as $element){
-		foreach ($results as $combination){
-			$result = array_merge(array($element), $combination);
-			array_push($results, $result);
-
-			if(count($result) == $limit){
-				$subset[] = $result;
-			}
-		}
-	}
-
-	return $subset;
-}
-
 function onPageLoad()
 {
     SQL::connectToDB();
@@ -140,7 +116,9 @@ function printResult($result)
 { //prints results from a select statement
     echo "<table>";
     $headerPrinted = false;
+    $count = 0;
     while ($row = OCI_Fetch_Array($result, OCI_ASSOC)) {
+        $count++;
         $tuple = "<tr>";
         $header = "<tr>";
         foreach ($row as $key => $value) {
@@ -162,7 +140,11 @@ function printResult($result)
         }
         echo $tuple;
     }
-    echo "</table>";
+    if ($count == 0) {
+        popUp("Result is empty");
+    } else {
+        echo "</table>";
+    }
 }
 
 function handleRequests()
