@@ -558,7 +558,11 @@ VALUES ('dreamindream', '257510', 'backlog');
 INSERT INTO Adds(Username, GID, Status)
 VALUES ('dreamindream', '216878', 'backlog');
 INSERT INTO Adds(Username, GID, Status)
+VALUES ('heronboy', '216878', 'complete');
+INSERT INTO Adds(Username, GID, Status)
 VALUES ('heronboy', '1778820', 'playing');
+INSERT INTO Adds(Username, GID, Status)
+VALUES ('heronboy', '101945', 'playing');
 INSERT INTO Adds(Username, GID, Status)
 VALUES ('mobius', '101945', 'playing');
 INSERT INTO Adds(Username, GID, Status)
@@ -610,6 +614,38 @@ INSERT INTO MakesReviewReviewing1(
 		GID
 	)
 VALUES (
+		'8766',
+		TO_DATE('2021-11-28', 'yyyy/mm/dd'),
+		'2',
+		'400',
+		'dreamindream',
+		'216878'
+	);
+INSERT INTO MakesReviewReviewing1(
+		ReviewID,
+		ReviewDate,
+		Rating,
+		Length,
+		Username,
+		GID
+	)
+VALUES (
+		'8767',
+		TO_DATE('2024-09-02', 'yyyy/mm/dd'),
+		'5',
+		'50',
+		'heronboy',
+		'216878'
+	);
+INSERT INTO MakesReviewReviewing1(
+		ReviewID,
+		ReviewDate,
+		Rating,
+		Length,
+		Username,
+		GID
+	)
+VALUES (
 		'1234',
 		TO_DATE('2023-09-05', 'yyyy/mm/dd'),
 		'4',
@@ -642,6 +678,22 @@ INSERT INTO MakesReviewReviewing1(
 		GID
 	)
 VALUES (
+		'5757',
+		TO_DATE('2018-08-10', 'yyyy/mm/dd'),
+		'2',
+		'50',
+		'mobius',
+		'257510'
+	);
+INSERT INTO MakesReviewReviewing1(
+		ReviewID,
+		ReviewDate,
+		Rating,
+		Length,
+		Username,
+		GID
+	)
+VALUES (
 		'1304',
 		TO_DATE('2020-08-13', 'yyyy/mm/dd'),
 		'4',
@@ -658,10 +710,42 @@ INSERT INTO MakesReviewReviewing1(
 		GID
 	)
 VALUES (
+		'1305',
+		TO_DATE('2019-09-12', 'yyyy/mm/dd'),
+		'5',
+		'1000',
+		'mobius',
+		'1778820'
+	);
+INSERT INTO MakesReviewReviewing1(
+		ReviewID,
+		ReviewDate,
+		Rating,
+		Length,
+		Username,
+		GID
+	)
+VALUES (
 		'8765',
 		TO_DATE('2021-10-14', 'yyyy/mm/dd'),
 		'5',
 		'400',
 		'mobius',
+		'101945'
+	);
+INSERT INTO MakesReviewReviewing1(
+		ReviewID,
+		ReviewDate,
+		Rating,
+		Length,
+		Username,
+		GID
+	)
+VALUES (
+		'8764',
+		TO_DATE('2022-07-20', 'yyyy/mm/dd'),
+		'3',
+		'200',
+		'heronboy',
 		'101945'
 	);
