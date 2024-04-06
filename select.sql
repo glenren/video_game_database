@@ -13,6 +13,5 @@ SELECT * FROM PlayedOn ;
 SELECT * FROM ContainsDLC ;
 SELECT * FROM Account ;
 SELECT * FROM Adds ;
-SELECT * FROM MakesReviewReviewing2 ;
 SELECT * FROM MakesReviewReviewing1 ;
-SELECT * FROM MakesReviewReviewing3 ;
+SELECT * FROM MakesReviewReviewing2 ;

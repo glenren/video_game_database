@@ -149,7 +149,7 @@ Mininum # of Reviews (leave blank to view all): <input type="number" name="min" 
         }
 
         function postGame($GID, $Name) {
-            $command = "SELECT Rating, COUNT(DISTINCT ReviewID) AS ReviewCount FROM"
+            $command = "SELECT Rating, COUNT(DISTINCT ReviewID) AS Review_Count FROM"
                 . " MakesReviewReviewing1 WHERE GID = '" . $GID . "' GROUP BY Rating";
 
             $result = SQL::executePlainSQL($command);
