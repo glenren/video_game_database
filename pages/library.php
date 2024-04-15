@@ -1,3 +1,25 @@
+<!-- Modified version of the Test Oracle file for UBC CPSC304
+  Created by Jiemin Zhang
+  Modified by Simona Radu
+  Modified by Jessica Wong (2018-06-22)
+  Modified by Jason Hall (23-09-20)
+  and Modified by Team 8 (Glen Ren, Chanaldy Soenarjo, and Kat Duangkham) in March-April 2024
+
+  The original  file showed the very basics of how to execute PHP commands on Oracle.
+  Specifically, it will drop a table, create a table, insert values update
+  values, and then query for values
+  IF YOU HAVE A TABLE CALLED "demoTable" IT WILL BE DESTROYED
+
+  The script assumed that you already have a server set up
+  All OCI commands are commands to the Oracle libraries.
+  To get the file to work, you must place it somewhere where
+  your Apache server can run it, and you must rename it to have
+  a ".php" extension.
+
+  You must also change the username and password on the
+  oci_connect below to be your ORACLE username and password
+-->
+
 <?php
 // The following 3 lines allow PHP errors to be displayed along with the page content.
 // Delete or comment out this block when it's no longer needed.
