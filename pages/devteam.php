@@ -1,5 +1,7 @@
 <?php
 require ('library.php');
+$creds = fopen("../credentials.txt", "r") or die("Unable to open file!");
+login($creds);
 ?>
 
 <head>
